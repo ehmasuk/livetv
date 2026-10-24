@@ -1,0 +1,17 @@
+
+[
+  {
+    "id": "iptv-org-sports",
+    "name": "IPTV-org Sports",
+    "enabled": true,
+    "category": "sports",
+    "url": "https://iptv-org.github.io/iptv/categories/sports.m3u"
+  },
+  {
+    "id": "mrgify-bdix",
+    "name": "Mrgify BDIX",
+    "enabled": true,
+    "category": "all",
+    "url": "https://raw.githubusercontent.com/abusaeeidx/Mrgify-BDIX-IPTV/main/playlist.m3u"
+  }
+]
