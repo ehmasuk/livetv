@@ -3,7 +3,7 @@
 import { ChannelListItem } from "@/components/home/channel-list-item"
 import { matchesSearch } from "@/lib/channels"
 import type { Channel, ChannelStatus } from "@/lib/types"
-import { ServerIcon } from "lucide-react"
+import { Search, ServerIcon, X } from "lucide-react"
 import { useEffect, useMemo, useRef } from "react"
 
 const SKELETON_ROW_COUNT = 6
@@ -57,6 +57,7 @@ export function ChannelBrowser({
   scanBoosted,
   statuses,
   search,
+  onSearchChange,
   onLoadMore,
   onBoostScan,
   onRetestAll,
@@ -180,6 +181,34 @@ export function ChannelBrowser({
 
   return (
     <div>
+      {/* Mobile-only search, directly above the channel list so it stays close
+          to the channels instead of sitting above the player. */}
+      {onSearchChange && (
+        <div className="relative mb-2 md:hidden">
+          <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+          <input
+            type="search"
+            value={search}
+            onChange={(event) => onSearchChange(event.target.value)}
+            placeholder="Search channels..."
+            autoComplete="off"
+            enterKeyHint="search"
+            className="w-full pl-9 pr-8 py-2.5 bg-background border border-border focus:border-red-500 rounded-lg text-sm text-foreground placeholder:text-muted-foreground outline-none transition"
+            aria-label="Search channels"
+          />
+          {search && (
+            <button
+              type="button"
+              onClick={() => onSearchChange("")}
+              aria-label="Clear search"
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Channel Cards List Container */}
       <div
         className="glass-panel max-h-125 min-h-95 space-y-1.5 overflow-y-auto rounded-xl border border-border p-2 lg:max-h-[calc(100vh-230px)]"

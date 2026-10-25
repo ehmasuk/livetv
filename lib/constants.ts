@@ -1,6 +1,6 @@
-export const APP_NAME = "Sports TV"
+export const APP_NAME = "LiveTVFree"
 export const APP_DESCRIPTION =
-  "Browse live sports channels from multiple public playlists and test which streams work in your browser."
+  "Watch live TV channels from public playlists — sports, news, entertainment and more. Browse working channels, test streams in your browser, and find the ones that play."
 
 /** How long a parsed playlist may be reused before it is fetched again. */
 export const PLAYLIST_REVALIDATE_SECONDS = 60 * 60

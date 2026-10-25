@@ -232,8 +232,9 @@ export function Dashboard({ server, servers, onSelectServer }: DashboardProps) {
             />
           </div>
 
-          {/* Channel Search Input */}
-          <div className="md:col-span-4 relative">
+          {/* Channel Search Input — desktop only; mobile search lives above
+              the channel list in ChannelBrowser. */}
+          <div className="hidden md:block md:col-span-4 relative">
             <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
             <input
               type="text"
@@ -287,6 +288,7 @@ export function Dashboard({ server, servers, onSelectServer }: DashboardProps) {
             scanBoosted={tester.scanBoosted}
             statuses={tester.statuses}
             search={search}
+            onSearchChange={setSearch}
             onLoadMore={tester.loadMore}
             onBoostScan={tester.boostScan}
             onRetestAll={handleRetestAll}

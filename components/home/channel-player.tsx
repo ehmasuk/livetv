@@ -78,7 +78,7 @@ export function ChannelPlayer({
             Select a channel to begin
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
-            Choose a stream from the sports channels library
+            Choose a stream from the live channels library
           </p>
         </div>
 

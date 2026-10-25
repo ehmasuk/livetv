@@ -93,7 +93,7 @@ export const ChannelListItem = memo(function ChannelListItem({
             {channel.name}
           </div>
           <div className="text-[9px] text-muted-foreground truncate mt-0.5">
-            {channel.group || "Sports"}
+            {channel.group || "General"}
           </div>
         </div>
       </div>

@@ -22,11 +22,27 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: `${APP_NAME} — Live Sports Streams`,
+    default: `${APP_NAME} — Live TV Streams`,
     template: `%s · ${APP_NAME}`,
   },
   description: APP_DESCRIPTION,
   applicationName: APP_NAME,
+  openGraph: {
+    siteName: APP_NAME,
+    title: `${APP_NAME} — Live TV Streams`,
+    description: APP_DESCRIPTION,
+    type: "website",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary",
+    title: `${APP_NAME} — Live TV Streams`,
+    description: APP_DESCRIPTION,
+  },
+  icons: {
+    icon: "/img/3dplay.png",
+    apple: "/img/3dplay.png",
+  },
 }
 
 /** Notch and home-indicator aware, installed-app friendly. */
@@ -34,7 +50,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#09090b",
+  themeColor: "#ef4444",
 }
 
 export default function RootLayout({
