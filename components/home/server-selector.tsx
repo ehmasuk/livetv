@@ -32,7 +32,7 @@ export function ServerSelector({
               onClick={() => onSelect(server.id)}
               aria-pressed={active}
               className={cn(
-                "flex w-full items-center gap-3 rounded-xl border p-3 text-left transition",
+                "flex min-h-[44px] w-full items-center gap-3 rounded-xl border p-3 text-left transition",
                 active
                   ? "border-red-500 bg-red-500/10"
                   : "border-white/10 bg-black/20 hover:border-white/20 hover:bg-white/5"

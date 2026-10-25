@@ -1,8 +1,28 @@
 "use client"
 
 import { Play } from "lucide-react"
-import { TVPlayer } from "@/components/tv-player"
+import dynamic from "next/dynamic"
 import type { Channel } from "@/lib/types"
+
+/**
+ * The player (and hls.js with it) is code-split: the list is interactive
+ * before the player chunk arrives, and its code is not fetched until a
+ * channel is actually selected.
+ */
+const TVPlayer = dynamic(
+  () => import("@/components/tv-player").then((mod) => mod.TVPlayer),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex aspect-video items-center justify-center rounded-2xl border border-white/10 bg-[#15151b] p-6 text-center">
+        <div
+          className="h-10 w-10 animate-spin rounded-full border-4 border-white/20 border-t-red-500"
+          aria-hidden="true"
+        />
+      </div>
+    ),
+  }
+)
 
 /** One-off player status message; `terminal` variants stay until the user acts. */
 export type PlaybackNotice = {
@@ -17,6 +37,10 @@ type ChannelPlayerProps = {
   attemptToken?: number
   onPlaybackWorking?: () => void
   onPlaybackFailed?: () => void
+  /** Reports whether this stream is actively playing (probes pause meanwhile). */
+  onPlaybackActiveChange?: (active: boolean) => void
+  /** Escape hatch from the player's "connection too slow" banner. */
+  onTryAnotherChannel?: () => void
   onRetry?: () => void
 }
 
@@ -26,6 +50,8 @@ export function ChannelPlayer({
   attemptToken = 0,
   onPlaybackWorking,
   onPlaybackFailed,
+  onPlaybackActiveChange,
+  onTryAnotherChannel,
   onRetry,
 }: ChannelPlayerProps) {
   if (!channel) {
@@ -71,6 +97,8 @@ export function ChannelPlayer({
         channelName={channel.name}
         onPlaybackWorking={onPlaybackWorking}
         onPlaybackFailed={onPlaybackFailed}
+        onPlaybackActiveChange={onPlaybackActiveChange}
+        onTryAnotherChannel={onTryAnotherChannel}
       />
     </div>
   )

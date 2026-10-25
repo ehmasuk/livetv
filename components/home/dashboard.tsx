@@ -8,6 +8,7 @@ import type { PlaybackNotice } from "@/components/home/channel-player"
 import { ServerSelector } from "@/components/home/server-selector"
 import { useChannels } from "@/hooks/use-channels"
 import { useLazyStreamTester } from "@/hooks/use-lazy-stream-tester"
+import { readSessionPrefs, writeSessionPrefs } from "@/lib/prefs"
 import type { Channel, ServerOption } from "@/lib/types"
 
 type DashboardProps = {
@@ -38,6 +39,10 @@ export function Dashboard({ server, servers, onSelectServer }: DashboardProps) {
   const [search, setSearch] = useState("")
   const [notice, setNotice] = useState<PlaybackNotice | null>(null)
   const [attemptToken, setAttemptToken] = useState(0)
+  /** Last played channel of this server, only used for a highlight. */
+  const [rememberedChannelId, setRememberedChannelId] = useState<string | null>(
+    null
+  )
 
   const tester = useLazyStreamTester(server.id, channels, search)
   const consecutiveFailsRef = useRef(0)
@@ -46,6 +51,21 @@ export function Dashboard({ server, servers, onSelectServer }: DashboardProps) {
     setNotice(null)
     consecutiveFailsRef.current = 0
   }, [])
+
+  // Restores the last played channel of this server as a highlight only —
+  // nothing auto-plays on load.
+  useEffect(() => {
+    const prefs = readSessionPrefs()
+    const channelId =
+      prefs.serverId === server.id ? (prefs.channelId ?? null) : null
+
+    queueMicrotask(() => setRememberedChannelId(channelId))
+  }, [server.id])
+
+  // Keeps the typed search term for the next visit; it is not re-applied.
+  useEffect(() => {
+    writeSessionPrefs({ search })
+  }, [search])
 
   // A fresh manual pick always starts a new streak.
   const handleSelect = useCallback(
@@ -59,8 +79,39 @@ export function Dashboard({ server, servers, onSelectServer }: DashboardProps) {
   const handlePlaybackWorking = useCallback(() => {
     consecutiveFailsRef.current = 0
 
-    if (selectedChannel) tester.reportPlayback(selectedChannel.id, true)
-  }, [tester, selectedChannel])
+    if (selectedChannel) {
+      tester.reportPlayback(selectedChannel.id, true)
+      writeSessionPrefs({ serverId: server.id, channelId: selectedChannel.id })
+    }
+  }, [tester, selectedChannel, server.id])
+
+  const handlePlaybackActiveChange = useCallback(
+    (active: boolean) => {
+      tester.setPlaybackActive(active)
+    },
+    [tester]
+  )
+
+  /**
+   * Escape hatch for the player's "connection too slow" banner: advances
+   * to the next working channel without counting a failure (the channel
+   * was too slow, not broken) and without touching the failure streak.
+   */
+  const handleTryAnotherChannel = useCallback(() => {
+    if (!selectedChannel) return
+
+    const next = nextWorkingChannel(tester.workingChannels, selectedChannel.id)
+
+    if (!next) {
+      setNotice({
+        text: "No other working channel was found yet. Try again later.",
+      })
+      return
+    }
+
+    setNotice({ text: "Trying the next working channel..." })
+    setSelectedChannel(next)
+  }, [selectedChannel, tester.workingChannels])
 
   const handlePlaybackFailed = useCallback(() => {
     if (!selectedChannel) return
@@ -102,6 +153,44 @@ export function Dashboard({ server, servers, onSelectServer }: DashboardProps) {
     tester.retestAll()
   }, [tester])
 
+  /**
+   * Warms the stream's origin while the player chunk is still loading:
+   * DNS, TCP and the TLS handshake are set up ahead of the player's first
+   * manifest request. The hint is replaced with every selection and
+   * dropped when the player closes.
+   */
+  useEffect(() => {
+    const url = selectedChannel?.url
+    if (!url) return
+
+    let origin: string
+
+    try {
+      origin = new URL(url).origin
+    } catch {
+      return
+    }
+
+    const links: HTMLLinkElement[] = []
+
+    for (const rel of ["preconnect", "dns-prefetch"] as const) {
+      const link = document.createElement("link")
+      link.rel = rel
+      link.href = origin
+
+      // The player (and every playlist fetch) runs in CORS mode, so the
+      // warmed connection must match that mode to be reused.
+      if (rel === "preconnect") link.crossOrigin = "anonymous"
+
+      document.head.appendChild(link)
+      links.push(link)
+    }
+
+    return () => {
+      for (const link of links) link.remove()
+    }
+  }, [selectedChannel])
+
   useEffect(() => {
     if (!notice || notice.terminal) return
 
@@ -110,9 +199,62 @@ export function Dashboard({ server, servers, onSelectServer }: DashboardProps) {
     return () => clearTimeout(timer)
   }, [notice])
 
+  // Publishes the sticky player rail's height as a CSS variable so the
+  // mobile search bar can stick directly below the player while the page
+  // scrolls. Values live on the document root, so the sibling aside can
+  // read it too.
+  const playerRailRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    const node = playerRailRef.current
+    if (!node) return
+
+    const update = () => {
+      document.documentElement.style.setProperty(
+        "--rb-player-h",
+        `${Math.round(node.getBoundingClientRect().height)}px`
+      )
+    }
+
+    update()
+    const observer = new ResizeObserver(update)
+    observer.observe(node)
+
+    return () => {
+      observer.disconnect()
+      document.documentElement.style.removeProperty("--rb-player-h")
+    }
+  }, [])
+
   return (
-    <>
-      <section className="min-w-0">
+    <div className="dashboard-grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+      <div
+        ref={playerRailRef}
+        className="[grid-area:rail] max-lg:sticky max-lg:top-0 max-lg:z-20 bg-[#09090b] pt-[env(safe-area-inset-top)] pb-2"
+      >
+        <ChannelPlayer
+          channel={selectedChannel}
+          notice={notice}
+          attemptToken={attemptToken}
+          onPlaybackWorking={handlePlaybackWorking}
+          onPlaybackFailed={handlePlaybackFailed}
+          onPlaybackActiveChange={handlePlaybackActiveChange}
+          onTryAnotherChannel={handleTryAnotherChannel}
+          onRetry={handleRetry}
+        />
+      </div>
+
+      <section className="[grid-area:main] min-w-0">
+        {tester.isOffline && (
+          <div
+            role="status"
+            className="mb-4 rounded-xl border border-amber-400/30 bg-amber-400/10 px-4 py-2 text-xs text-amber-200"
+          >
+            You are offline — channel testing is paused and streams may not
+            load. Checking your connection...
+          </div>
+        )}
+
         <div className="mb-5">
           <p className="mb-2 text-xs font-bold tracking-[0.25em] text-red-400 uppercase">
             Your sports destination
@@ -125,15 +267,6 @@ export function Dashboard({ server, servers, onSelectServer }: DashboardProps) {
           </p>
         </div>
 
-        <ChannelPlayer
-          channel={selectedChannel}
-          notice={notice}
-          attemptToken={attemptToken}
-          onPlaybackWorking={handlePlaybackWorking}
-          onPlaybackFailed={handlePlaybackFailed}
-          onRetry={handleRetry}
-        />
-
         <ChannelHealth
           counts={tester.counts}
           isTesting={tester.isTesting}
@@ -142,7 +275,7 @@ export function Dashboard({ server, servers, onSelectServer }: DashboardProps) {
         />
       </section>
 
-      <aside className="min-w-0">
+      <aside className="[grid-area:aside] min-w-0">
         <ServerSelector
           servers={servers}
           selectedServerId={server.id}
@@ -165,10 +298,10 @@ export function Dashboard({ server, servers, onSelectServer }: DashboardProps) {
           loading={loading}
           error={error}
           serverName={server.name}
-          selectedChannelId={selectedChannel?.id ?? null}
+          selectedChannelId={selectedChannel?.id ?? rememberedChannelId}
           onSelect={handleSelect}
         />
       </aside>
-    </>
+    </div>
   )
 }

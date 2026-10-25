@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import {
   SEARCH_DEBOUNCE_MS,
+  STREAM_HEALTH_BATTERY_LOW_LEVEL,
   STREAM_HEALTH_BUFFER_PAGES,
   STREAM_HEALTH_CACHE_PREFIX,
   STREAM_HEALTH_FLUSH_INTERVAL_MS,
@@ -13,6 +14,8 @@ import {
   STREAM_PAGE_SIZE,
   STREAM_TEST_BATCH_SIZE,
 } from "@/lib/constants"
+import { getProbeLimits } from "@/lib/connection"
+import type { ProbeLimits } from "@/lib/connection"
 import { matchesSearch } from "@/lib/channels"
 import { isUnsupportedStreamUrl, testStream } from "@/lib/stream-test"
 import type { Channel, ChannelStatus } from "@/lib/types"
@@ -45,6 +48,8 @@ export type LazyStreamTester = {
   isTesting: boolean
   /** True when every testable channel has a fresh verdict. */
   isDone: boolean
+  /** True while the browser reports no network connection (probes paused). */
+  isOffline: boolean
   /** True while the low-priority background scan of the whole server runs. */
   isScanning: boolean
   /** True after the user boosted the background scan to full speed. */
@@ -60,6 +65,8 @@ export type LazyStreamTester = {
   reportPlayback: (id: string, ok: boolean) => void
   /** Clears this server's saved results and tests everything again. */
   retestAll: () => void
+  /** Marks whether a channel is playing so probes yield to the live stream. */
+  setPlaybackActive: (active: boolean) => void
 }
 
 type RunState = {
@@ -74,6 +81,19 @@ type RunState = {
   finished: boolean
   paused: boolean
   inFlight: Set<string>
+}
+
+type BatteryManagerLike = {
+  level: number
+  charging: boolean
+  addEventListener: (
+    type: "levelchange" | "chargingchange",
+    listener: () => void
+  ) => void
+  removeEventListener: (
+    type: "levelchange" | "chargingchange",
+    listener: () => void
+  ) => void
 }
 
 type SearchPredicate = (channel: Channel) => boolean
@@ -191,6 +211,7 @@ export function useLazyStreamTester(
   const [isDone, setIsDone] = useState(true)
   const [isScanning, setIsScanning] = useState(false)
   const [scanBoosted, setScanBoosted] = useState(false)
+  const [isOffline, setIsOffline] = useState(false)
 
   const aliveRef = useRef(true)
   const runRef = useRef<RunState | null>(null)
@@ -215,7 +236,25 @@ export function useLazyStreamTester(
   const predicateRef = useRef<SearchPredicate | null>(null)
   const pumpRef = useRef<() => void>(() => {})
   const scanBoostRef = useRef(false)
-  const saveDataRef = useRef(false)
+  /** Mirror of the last emitted status map, for skip-if-unchanged writes. */
+  const statusesRef = useRef<Record<string, ChannelStatus>>({})
+  /**
+   * Probe pool sizes for this device (adaptive concurrency): phones, slow
+   * or metered connections get smaller pools. Set when the tester mounts.
+   */
+  const limitsRef = useRef<ProbeLimits>({
+    foreground: STREAM_TEST_BATCH_SIZE,
+    scan: STREAM_HEALTH_SCAN_CONCURRENCY,
+    saveData: false,
+  })
+  /** True while the battery is below threshold and not charging. */
+  const batteryLowRef = useRef(false)
+  /** True while a channel plays or loads; probing yields to the stream. */
+  const playbackHoldRef = useRef(false)
+  /** Scan-boost choice snapshot taken when the hold starts, restored on release. */
+  const holdScanBoostRef = useRef(false)
+  /** True while the browser reports being offline. */
+  const offlineRef = useRef(false)
 
   const appendWorkingId = useCallback((id: string) => {
     if (workingIdsRef.current.includes(id)) return
@@ -228,7 +267,10 @@ export function useLazyStreamTester(
   const emitStatuses = useCallback(() => {
     const byId = byIdRef.current
     if (byId.size === 0) {
-      setStatuses({})
+      if (Object.keys(statusesRef.current).length > 0) {
+        statusesRef.current = {}
+        setStatuses({})
+      }
       return
     }
 
@@ -256,7 +298,18 @@ export function useLazyStreamTester(
       }
     }
 
-    setStatuses(next)
+    // Skip the state write when nothing changed: the last settled probe of
+    // a scan batch otherwise re-renders every map consumer identically.
+    const previous = statusesRef.current
+    const nextKeys = Object.keys(next)
+    const changed =
+      Object.keys(previous).length !== nextKeys.length ||
+      nextKeys.some((key) => previous[key] !== next[key])
+
+    if (changed) {
+      statusesRef.current = next
+      setStatuses(next)
+    }
   }, [])
 
   /** Marks running/finished/scanning state for the panel, status line and indicator. */
@@ -269,7 +322,8 @@ export function useLazyStreamTester(
       !run.finished &&
         run.paused &&
         run.queueIndex < run.queue.length &&
-        !saveDataRef.current
+        !limitsRef.current.saveData &&
+        !batteryLowRef.current
     )
   }, [])
 
@@ -375,7 +429,7 @@ export function useLazyStreamTester(
     pumpRef.current()
   }, [rebuildQueue])
 
-  const beginRun = useCallback(() => {
+  const beginRun = useCallback((options?: { keepScanBoost?: boolean }) => {
     runCountRef.current += 1
     const run: RunState = {
       id: runCountRef.current,
@@ -390,9 +444,13 @@ export function useLazyStreamTester(
     }
     runRef.current = run
 
-    // Each run starts with the scan lane at its normal (slow) setting.
-    scanBoostRef.current = false
-    setScanBoosted(false)
+    // Each run starts with the scan lane at its normal (slow) setting —
+    // unless the caller is resuming after a playback hold and the boost
+    // the user chose before the hold must survive the pause.
+    if (options?.keepScanBoost !== true) {
+      scanBoostRef.current = false
+      setScanBoosted(false)
+    }
 
     rebuildQueue()
 
@@ -430,27 +488,36 @@ export function useLazyStreamTester(
   )
 
   /**
-   * Fills the foreground pool (`STREAM_TEST_BATCH_SIZE` probes) and the
-   * background scan lane (`STREAM_HEALTH_SCAN_CONCURRENCY`). Foreground
-   * lanes: filling the visible list and, at highest priority, search
-   * matches. Search matches start even while the list is buffered beyond
-   * the visible pages. One settled probe immediately frees its slot.
+   * Fills the foreground pool (`limitsRef.current.foreground` probes, 4 on
+   * desktops and 2 on phones/slow or metered connections) and the background
+   * scan lane (`limitsRef.current.scan`, boosted to the foreground pool when
+   * the user boosts). Foreground lanes: filling the visible list and, at
+   * highest priority, search matches — matches start even while the list is
+   * buffered beyond the visible pages. While a channel plays or loads in
+   * the player nothing starts at all (`playbackHoldRef`): probes already
+   * running were aborted, and a fresh run is opened when playback stops.
+   * Without a network connection nothing starts either.
    */
   const pump = useCallback(() => {
     const run = runRef.current
     if (!run || run.finished || !aliveRef.current) return
 
+    // While the live stream has the connection, no new probes may start.
+    if (playbackHoldRef.current) return
+
     if (isPageHidden()) return
+    if (offlineRef.current) return
 
     // Lazy testing: once the list is buffered beyond what is visible, the
     // remaining backlog moves to the low-speed background scan lane.
     const buffered = workingIdsRef.current.length - visibleCountRef.current
     run.paused = buffered >= BUFFER_PAUSE_COUNT
 
-    const scanLaneCap = scanBoostRef.current
-      ? STREAM_TEST_BATCH_SIZE
-      : STREAM_HEALTH_SCAN_CONCURRENCY
-    const scanLaneAllowed = !saveDataRef.current
+    const limits = limitsRef.current
+    const foregroundPool = limits.foreground
+    const scanLaneCap = scanBoostRef.current ? foregroundPool : limits.scan
+
+    const scanLaneAllowed = !limits.saveData && !batteryLowRef.current
 
     while (run.queueIndex < run.queue.length) {
       const foregroundCount = run.activeCount - run.scanIds.size
@@ -464,21 +531,21 @@ export function useLazyStreamTester(
       if (isEntryFresh(cacheRef.current.get(id))) continue
 
       const isMatch = predicateRef.current?.(channel) === true
+      const usesForegroundLane = isMatch || !run.paused
 
-      // No slot available for the class this candidate belongs to: put it
+      // No slot available for the lane this candidate belongs to: put it
       // back and wait for the next event. Queue order means matches sit in
       // front, so a blocked scan head never starves pending matches.
-      const blocked =
-        isMatch || !run.paused
-          ? foregroundCount >= STREAM_TEST_BATCH_SIZE
-          : !scanLaneAllowed || run.scanIds.size >= scanLaneCap
+      const blocked = usesForegroundLane
+        ? foregroundCount >= foregroundPool
+        : !scanLaneAllowed || run.scanIds.size >= scanLaneCap
 
       if (blocked) {
         run.queueIndex -= 1
         break
       }
 
-      const wasScan = !isMatch && run.paused
+      const wasScan = !usesForegroundLane
 
       run.activeCount += 1
       run.inFlight.add(id)
@@ -516,12 +583,14 @@ export function useLazyStreamTester(
     channelsRef.current = channels
     byIdRef.current = byId
 
-    // Data-saver users opt out of the background scan entirely; the existing
-    // lazy behavior and search tests stay active.
-    const connection = (
-      navigator as Navigator & { connection?: { saveData?: boolean } }
-    ).connection
-    saveDataRef.current = connection?.saveData === true
+    // Probe pool sized once per run: phones and slow/metered connections
+    // get smaller pools; saveData opts out of the background scan entirely
+    // while the lazy behavior and search tests stay active.
+    limitsRef.current = getProbeLimits()
+
+    // No network at mount: skip probing until the connection returns.
+    offlineRef.current =
+      typeof navigator !== "undefined" && navigator.onLine === false
 
     // Cached results serve the selected server immediately; entries for
     // channels that no longer exist in the playlist are ignored.
@@ -566,7 +635,7 @@ export function useLazyStreamTester(
     })
 
     const onVisibilityChange = () => {
-      if (!isPageHidden()) pumpRef.current()
+      if (!isPageHidden() && !offlineRef.current) pumpRef.current()
     }
 
     document.addEventListener("visibilitychange", onVisibilityChange)
@@ -592,6 +661,75 @@ export function useLazyStreamTester(
       flush()
     }
   }, [serverId, channels, byId, beginRun, flush])
+
+  // Probing pauses without a network connection and resumes when it returns.
+  useEffect(() => {
+    const goOffline = () => {
+      offlineRef.current = true
+      queueMicrotask(() => setIsOffline(true))
+    }
+
+    const goOnline = () => {
+      offlineRef.current = false
+      queueMicrotask(() => {
+        setIsOffline(false)
+        pumpRef.current()
+      })
+    }
+
+    window.addEventListener("online", goOnline)
+    window.addEventListener("offline", goOffline)
+
+    return () => {
+      window.removeEventListener("online", goOnline)
+      window.removeEventListener("offline", goOffline)
+    }
+  }, [])
+
+  // A low battery (below threshold, not charging) closes the background
+  // scan lane; foreground work for matches and the visible list stays on.
+  useEffect(() => {
+    const nav = navigator as Navigator & {
+      getBattery?: () => Promise<BatteryManagerLike>
+    }
+    const getBattery = nav.getBattery
+    if (typeof getBattery !== "function") return
+
+    let cancelled = false
+    let battery: BatteryManagerLike | null = null
+
+    const updateLow = () => {
+      if (!battery) return
+
+      const low =
+        !battery.charging && battery.level < STREAM_HEALTH_BATTERY_LOW_LEVEL
+
+      if (low === batteryLowRef.current) return
+
+      batteryLowRef.current = low
+
+      // Recovered power re-opens the scan lane immediately.
+      if (!low) pumpRef.current()
+    }
+
+    getBattery
+      .call(navigator)
+      .then((manager) => {
+        if (cancelled) return
+
+        battery = manager
+        manager.addEventListener("levelchange", updateLow)
+        manager.addEventListener("chargingchange", updateLow)
+        updateLow()
+      })
+      .catch(() => {})
+
+    return () => {
+      cancelled = true
+      battery?.removeEventListener("levelchange", updateLow)
+      battery?.removeEventListener("chargingchange", updateLow)
+    }
+  }, [])
 
   // A changed search term reprioritizes the queue after a short debounce; it
   // never aborts in-flight tests and never restarts the run.
@@ -671,6 +809,61 @@ export function useLazyStreamTester(
     beginRun()
   }, [beginRun, flush])
 
+  /**
+   * The player reports when its stream is active (playing or starting) and
+   * when it stops again. While active, probing is put fully on hold: the
+   * current run is torn down and in-flight probes are aborted — testStream
+   * answers `false` for aborted probes, which `probeFinished` drops (dead
+   * run) so channels are neither marked failed nor cached mid-flight. When
+   * playback stops, a fresh run re-enumerates everything not freshly cached
+   * in stable queue order, keeping the scan boost the user had chosen.
+   */
+  const setPlaybackActive = useCallback(
+    (active: boolean) => {
+      if (playbackHoldRef.current === active) return
+
+      playbackHoldRef.current = active
+
+      if (active) {
+        // Snapshot the scan boost so the release can restore it, then stop
+        // every probe: the run is detached first (so each aborted test's
+        // late settle sees no live run and drops its result), then the
+        // controller aborts what is in flight.
+        holdScanBoostRef.current = scanBoostRef.current
+
+        const run = runRef.current
+
+        runRef.current = null
+
+        if (run) {
+          run.finished = true
+          run.controller.abort()
+        }
+
+        queueMicrotask(() => {
+          setIsTesting(false)
+          setIsScanning(false)
+          emitStatuses()
+        })
+      } else {
+        // Release: the live stream no longer needs the connection. Restart
+        // probing with the boost state the user picked before the hold.
+        const keepScanBoost = holdScanBoostRef.current
+        holdScanBoostRef.current = false
+
+        const held = runRef.current
+
+        if (held) {
+          held.finished = true
+          held.controller.abort()
+        }
+
+        beginRun({ keepScanBoost })
+      }
+    },
+    [beginRun, emitStatuses]
+  )
+
   const workingChannels = useMemo(
     () =>
       workingIds
@@ -716,6 +909,7 @@ export function useLazyStreamTester(
     hasMore,
     isTesting,
     isDone,
+    isOffline,
     isScanning,
     scanBoosted,
     statuses,
@@ -724,5 +918,6 @@ export function useLazyStreamTester(
     boostScan,
     reportPlayback,
     retestAll,
+    setPlaybackActive,
   }
 }

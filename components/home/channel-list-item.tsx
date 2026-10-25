@@ -47,7 +47,7 @@ export const ChannelListItem = memo(function ChannelListItem({
       aria-pressed={selected}
       aria-label={`${channel.name}, ${channel.group}, ${statusLabel}`}
       className={cn(
-        "flex w-full items-center gap-3 rounded-xl border p-3 text-left transition",
+        "cv-row flex w-full items-center gap-3 rounded-xl border p-3 text-left transition",
         selected
           ? "border-red-500 bg-red-500/10"
           : "border-white/5 bg-[#101014] hover:border-white/20 hover:bg-[#19191f]"
@@ -57,12 +57,15 @@ export const ChannelListItem = memo(function ChannelListItem({
         {showLogo ? (
           // Channel logos come from arbitrary playlist hosts, so the Next.js
           // image optimizer cannot be used without proxying every host.
+          // Logos load only near the viewport anyway; while the player
+          // boots the ones that do load must never compete for bandwidth.
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={channel.logo}
             alt=""
             loading="lazy"
             decoding="async"
+            fetchPriority="low"
             referrerPolicy="no-referrer"
             width={44}
             height={44}

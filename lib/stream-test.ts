@@ -94,6 +94,7 @@ export function testStream(
       video.removeEventListener("playing", onPlaying)
       video.removeEventListener("error", onError)
       video.removeEventListener("loadedmetadata", onMetadata)
+      video.removeEventListener("loadeddata", onData)
 
       // `destroy()` aborts every in-flight fragment/playlist request and
       // detaches the media element, so nothing keeps downloading.
@@ -130,14 +131,18 @@ export function testStream(
     }
 
     // `playing` still counts, some browsers start playback before metadata
-    // settles, but success no longer *requires* it.
+    // settles, but success no longer *requires* it. On the native-HLS path
+    // `loadeddata` is the equivalent of "metadata and the first frame's data
+    // are there" — a stricter signal for Safari-style preload="metadata".
     const onPlaying = () => finish(true)
     const onError = () => finish(false)
     const onMetadata = () => finish(true)
+    const onData = () => finish(true)
 
     video.addEventListener("playing", onPlaying)
     video.addEventListener("error", onError)
     video.addEventListener("loadedmetadata", onMetadata)
+    video.addEventListener("loadeddata", onData)
 
     const timer = setTimeout(() => finish(false), STREAM_TEST_TIMEOUT_MS)
 

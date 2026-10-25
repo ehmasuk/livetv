@@ -127,4 +127,54 @@
   html {
     @apply font-sans;
     }
+
+  /* Touch: no double-tap zoom delay on tappable surfaces. */
+  button,
+  a,
+  [role="button"],
+  input[type="search"] {
+    touch-action: manipulation;
+    }
+}
+
+@layer components {
+  /*
+   * The dashboard grid: on phones the player rail is a sticky block at the
+   * top of the page scroll, and the list scrolls below it; named areas let
+   * the rail (a direct grid child) keep sticking across the whole page.
+   */
+  .dashboard-grid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-areas:
+      "rail"
+      "main"
+      "aside";
+  }
+
+  @media (min-width: 1024px) {
+    .dashboard-grid {
+      grid-template-areas:
+        "rail aside"
+        "main aside";
+    }
+  }
+}
+
+@layer utilities {
+  /* Long channel lists: skip painting rows far below the fold. */
+  .cv-row {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 68px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    }
 }

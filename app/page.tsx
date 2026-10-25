@@ -7,7 +7,7 @@ export default function Page() {
   const servers = getServerOptions()
 
   return (
-    <main className="min-h-screen bg-[#09090b] text-white">
+    <main className="min-h-dvh bg-[#09090b] pt-[env(safe-area-inset-top)] text-white">
       <SiteHeader />
 
       {servers.length > 0 ? (

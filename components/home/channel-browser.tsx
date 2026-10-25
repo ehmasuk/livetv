@@ -1,9 +1,24 @@
 "use client"
 
+import { X } from "lucide-react"
 import { useEffect, useMemo, useRef } from "react"
 import { ChannelListItem } from "@/components/home/channel-list-item"
 import { matchesSearch } from "@/lib/channels"
 import type { Channel, ChannelStatus } from "@/lib/types"
+
+const SKELETON_ROW_COUNT = 6
+
+function ChannelRowSkeleton() {
+  return (
+    <div className="flex items-center gap-3 rounded-xl border border-white/5 bg-[#101014] p-3">
+      <span className="h-11 w-11 shrink-0 animate-pulse rounded-lg bg-[#1d1d24]" />
+      <div className="min-w-0 flex-1 space-y-2">
+        <span className="block h-4 w-1/3 rounded bg-[#1d1d24]" />
+        <span className="block h-3 w-1/4 rounded bg-[#1d1d24]" />
+      </div>
+    </div>
+  )
+}
 
 type ChannelBrowserProps = {
   /** The full playlist, used for empty-playlist detection and match counting. */
@@ -120,13 +135,21 @@ export function ChannelBrowser({
     prevSearchRef.current = search
   }, [search, isSearching])
 
-  // Infinite scroll: the sentinel sits at the end of the list. Reobserve
-  // when the sentinel can swap between search and normal mode renders.
+  // Infinite scroll: the sentinel sits at the end of the list. The observer
+  // root is whichever scroll container actually scrolls: the list container
+  // itself on desktop (it keeps its own scrolling pane) or the viewport on
+  // mobile, where the page scrolls.
   useEffect(() => {
     if (!hasMore) return
 
     const node = sentinelRef.current
     if (!node) return
+
+    const container = scrollRef.current
+    const root =
+      container && container.scrollHeight > container.clientHeight + 1
+        ? container
+        : null
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -139,7 +162,7 @@ export function ChannelBrowser({
 
         onLoadMoreRef.current()
       },
-      { rootMargin: "400px" }
+      { root, rootMargin: "400px" }
     )
 
     observer.observe(node)
@@ -166,24 +189,45 @@ export function ChannelBrowser({
 
       <p className="mb-3 text-xs text-zinc-500">Source: {serverName}</p>
 
-      <input
-        type="search"
-        value={search}
-        onChange={(event) => onSearchChange(event.target.value)}
-        placeholder="Search channels..."
-        autoComplete="off"
-        className="mb-3 w-full rounded-xl border border-white/10 bg-[#15151b] px-4 py-3 text-sm outline-none placeholder:text-zinc-500 focus:border-red-500"
-        aria-label="Search channels"
-      />
+      <div className="relative mb-3 max-lg:sticky max-lg:top-[var(--rb-player-h,0px)] max-lg:z-10 max-lg:bg-[#09090b] max-lg:pb-1">
+        <input
+          type="search"
+          value={search}
+          onChange={(event) => onSearchChange(event.target.value)}
+          placeholder="Search channels..."
+          autoComplete="off"
+          enterKeyHint="search"
+          className="w-full min-h-[44px] rounded-xl border border-white/10 bg-[#15151b] px-4 py-3 pr-12 text-base outline-none placeholder:text-zinc-500 focus:border-red-500"
+          aria-label="Search channels"
+        />
 
+        {isSearching && (
+          <button
+            type="button"
+            onClick={() => onSearchChange("")}
+            aria-label="Clear search"
+            className="absolute top-1/2 right-1 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full text-zinc-400 transition hover:bg-white/10 hover:text-white"
+          >
+            <X className="h-4 w-4" aria-hidden="true" />
+          </button>
+        )}
+      </div>
+
+      {/* The page scrolls on mobile; desktop keeps the list's own pane. */}
       <div
-        className="max-h-[650px] space-y-2 overflow-y-auto pr-1"
+        className="space-y-2 lg:max-h-[650px] lg:overflow-y-auto lg:pr-1"
         ref={scrollRef}
       >
         {loading && (
-          <p className="py-8 text-center text-sm text-zinc-400">
-            Loading {serverName} channels...
-          </p>
+          <>
+            <p className="sr-only" aria-live="polite">
+              Loading {serverName} channels...
+            </p>
+
+            {Array.from({ length: SKELETON_ROW_COUNT }, (_, index) => (
+              <ChannelRowSkeleton key={index} />
+            ))}
+          </>
         )}
 
         {!loading && error && (
@@ -208,7 +252,7 @@ export function ChannelBrowser({
             <button
               type="button"
               onClick={onRetestAll}
-              className="mt-4 rounded-xl bg-red-600 px-5 py-2 text-xs font-bold text-white transition hover:bg-red-500"
+              className="mt-4 inline-flex min-h-[44px] items-center rounded-xl bg-red-600 px-5 text-xs font-bold text-white transition hover:bg-red-500"
             >
               Retest
             </button>
@@ -265,7 +309,7 @@ export function ChannelBrowser({
                   <button
                     type="button"
                     onClick={onBoostScan}
-                    className="underline transition hover:text-zinc-300"
+                    className="inline-flex min-h-[44px] items-center px-2 underline transition hover:text-zinc-300"
                   >
                     Check all channels now
                   </button>

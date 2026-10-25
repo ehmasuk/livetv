@@ -1,8 +1,9 @@
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { Geist_Mono, Inter } from "next/font/google"
 import type { ReactNode } from "react"
 
 import "./globals.css"
+import { PwaRegistrar } from "@/components/pwa-register"
 import { ThemeProvider } from "@/components/theme-provider"
 import { APP_DESCRIPTION, APP_NAME } from "@/lib/constants"
 import { cn } from "@/lib/utils"
@@ -28,6 +29,14 @@ export const metadata: Metadata = {
   applicationName: APP_NAME,
 }
 
+/** Notch and home-indicator aware, installed-app friendly. */
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#09090b",
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -41,6 +50,7 @@ export default function RootLayout({
     >
       <body>
         <ThemeProvider>{children}</ThemeProvider>
+        <PwaRegistrar />
       </body>
     </html>
   )

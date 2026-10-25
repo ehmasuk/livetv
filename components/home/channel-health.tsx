@@ -36,7 +36,7 @@ export function ChannelHealth({
         type="button"
         onClick={onRetestAll}
         disabled={disabled || isTesting}
-        className="mt-4 rounded-xl bg-red-600 px-5 py-3 text-sm font-bold transition hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-50"
+        className="mt-4 inline-flex min-h-[44px] items-center rounded-xl bg-red-600 px-5 py-3 text-sm font-bold transition hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-50"
       >
         Retest all channels
       </button>
