@@ -39,9 +39,7 @@ export function HomePage({ servers }: HomePageProps) {
   }
 
   return (
-    <div
-      className="mx-auto max-w-[1600px] p-4 pb-[max(env(safe-area-inset-bottom),1rem)] pl-[max(env(safe-area-inset-left),1rem)] pr-[max(env(safe-area-inset-right),1rem)] sm:p-6 sm:pb-[max(env(safe-area-inset-bottom),1.5rem)] sm:pl-[max(env(safe-area-inset-left),1.5rem)] sm:pr-[max(env(safe-area-inset-right),1.5rem)]"
-    >
+    <div className="mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 py-4 pb-[max(env(safe-area-inset-bottom),1.5rem)]">
       <Dashboard
         key={selectedServer.id}
         servers={servers}

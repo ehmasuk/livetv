@@ -280,9 +280,9 @@ export function useLazyStreamTester(
 
     for (const [id, channel] of byId) {
       // http:// streams cannot be probed from an https:// page; a retry can
-      // never change that, so report it outright.
+      // never change that, so report them as failed outright.
       if (isUnsupportedStreamUrl(channel.url)) {
-        next[id] = "unsupported"
+        next[id] = "failed"
         continue
       }
 
@@ -612,6 +612,10 @@ export function useLazyStreamTester(
     const workingSeed: string[] = []
 
     for (const channel of channels) {
+      // A verdict cached while the page was served over plain http:// must
+      // never resurface a channel the secure page can no longer play.
+      if (isUnsupportedStreamUrl(channel.url)) continue
+
       const entry = pruned.get(channel.id)
 
       if (entry?.ok && isEntryFresh(entry)) workingSeed.push(channel.id)
@@ -883,10 +887,9 @@ export function useLazyStreamTester(
           working += 1
           break
         // Channels that cannot run in this browser (http:// on an https://
-        // page) count as failed in the totals: they need no retry to know
-        // they will not work.
+        // page) are reported as failed, so they need no retry to know they
+        // will not work.
         case "failed":
-        case "unsupported":
           failed += 1
           break
         case "testing":

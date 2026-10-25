@@ -7,15 +7,15 @@ export default function Page() {
   const servers = getServerOptions()
 
   return (
-    <main className="min-h-dvh bg-[#09090b] pt-[env(safe-area-inset-top)] text-white">
+    <main className="min-h-dvh bg-background pt-[env(safe-area-inset-top)] text-foreground">
       <SiteHeader />
 
       {servers.length > 0 ? (
         <HomePage servers={servers} />
       ) : (
-        <div className="mx-auto max-w-3xl p-6 text-sm text-zinc-400">
+        <div className="mx-auto max-w-3xl p-6 text-sm text-muted-foreground">
           No enabled servers are configured. Add one to{" "}
-          <code className="rounded bg-white/10 px-1.5 py-0.5 text-xs">
+          <code className="rounded bg-muted px-1.5 py-0.5 text-xs">
             config/servers.json
           </code>
           .

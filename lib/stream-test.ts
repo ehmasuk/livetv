@@ -32,8 +32,8 @@ function responseBytes(stats: LoaderStats | undefined): number {
 
 /**
  * `http://` streams cannot load from an `https://` page (mixed content), so
- * probing them would always fail. Callers use this to mark such channels as
- * unsupported instead of wasting a probe on them.
+ * probing them would always fail. Callers use this to treat such channels as
+ * failed without wasting a probe on them.
  */
 export function isUnsupportedStreamUrl(url: string): boolean {
   if (typeof window === "undefined" || !window.isSecureContext) return false

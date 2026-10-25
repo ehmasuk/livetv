@@ -14,11 +14,22 @@ const TVPlayer = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex aspect-video items-center justify-center rounded-2xl border border-white/10 bg-[#15151b] p-6 text-center">
-        <div
-          className="h-10 w-10 animate-spin rounded-full border-4 border-white/20 border-t-red-500"
-          aria-hidden="true"
-        />
+      <div className="w-full overflow-hidden rounded-2xl border border-border bg-background shadow-lg flex flex-col">
+        <div className="relative aspect-video player-grid-bg flex items-center justify-center">
+          <div
+            className="h-10 w-10 animate-spin rounded-full border-4 border-border/50 border-t-red-500"
+            aria-hidden="true"
+          />
+        </div>
+        <div className="flex items-center gap-2 px-4 py-3 border-t border-border/80 bg-background/95">
+          <span className="h-2 w-2 rounded-full bg-amber-400 animate-pulse" />
+          <span className="truncate text-sm font-medium text-muted-foreground">
+            Loading player...
+          </span>
+          <span className="ml-auto text-xs text-muted-foreground">
+            LOADING
+          </span>
+        </div>
       </div>
     ),
   }
@@ -56,28 +67,43 @@ export function ChannelPlayer({
 }: ChannelPlayerProps) {
   if (!channel) {
     return (
-      <div className="flex aspect-video items-center justify-center rounded-2xl border border-white/10 bg-[#15151b] p-6 text-center">
-        <div>
-          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-white/5">
-            <Play className="h-6 w-6 text-zinc-400" aria-hidden="true" />
+      <div className="w-full overflow-hidden rounded-2xl border border-border bg-background shadow-lg flex flex-col">
+        {/* Relative aspect-video screen matching real player */}
+        <div className="relative aspect-video player-grid-bg flex flex-col items-center justify-center p-6 text-center select-none">
+          <div className="flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-full bg-card/90 border border-border/80 text-muted-foreground shadow-lg transition-transform duration-200 hover:scale-105">
+            <Play className="h-7 w-7 sm:h-8 sm:w-8 fill-current ml-1" />
           </div>
-          <p className="font-semibold">Choose a channel</p>
-          <p className="mt-2 text-sm text-zinc-500">
-            Select a channel to open its player.
+
+          <p className="mt-4 text-sm sm:text-base font-semibold text-foreground">
+            Select a channel to begin
           </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Choose a stream from the sports channels library
+          </p>
+        </div>
+
+        {/* Real-matching bottom control bar */}
+        <div className="flex items-center gap-2 px-4 py-3 border-t border-border/80 bg-background/95">
+          <span className="h-2 w-2 rounded-full bg-muted-foreground/40" />
+          <span className="truncate text-sm font-medium text-muted-foreground">
+            No channel selected
+          </span>
+          <span className="ml-auto text-xs text-muted-foreground">
+            READY
+          </span>
         </div>
       </div>
     )
   }
 
   return (
-    <div>
+    <div className="space-y-2">
       {notice && (
         <div
           role="status"
-          className="mb-2 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2"
+          className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2"
         >
-          <p className="text-sm text-red-200">{notice.text}</p>
+          <p className="text-sm text-red-500 dark:text-red-200">{notice.text}</p>
 
           {notice.terminal && (
             <button
@@ -103,3 +129,5 @@ export function ChannelPlayer({
     </div>
   )
 }
+
+

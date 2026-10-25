@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
+import { Search, X } from "lucide-react"
 import { ChannelBrowser } from "@/components/home/channel-browser"
 import { ChannelHealth } from "@/components/home/channel-health"
 import { ChannelPlayer } from "@/components/home/channel-player"
@@ -199,109 +200,105 @@ export function Dashboard({ server, servers, onSelectServer }: DashboardProps) {
     return () => clearTimeout(timer)
   }, [notice])
 
-  // Publishes the sticky player rail's height as a CSS variable so the
-  // mobile search bar can stick directly below the player while the page
-  // scrolls. Values live on the document root, so the sibling aside can
-  // read it too.
-  const playerRailRef = useRef<HTMLDivElement | null>(null)
-
-  useEffect(() => {
-    const node = playerRailRef.current
-    if (!node) return
-
-    const update = () => {
-      document.documentElement.style.setProperty(
-        "--rb-player-h",
-        `${Math.round(node.getBoundingClientRect().height)}px`
-      )
-    }
-
-    update()
-    const observer = new ResizeObserver(update)
-    observer.observe(node)
-
-    return () => {
-      observer.disconnect()
-      document.documentElement.style.removeProperty("--rb-player-h")
-    }
-  }, [])
-
   return (
-    <div className="dashboard-grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-      <div
-        ref={playerRailRef}
-        className="[grid-area:rail] max-lg:sticky max-lg:top-0 max-lg:z-20 bg-[#09090b] pt-[env(safe-area-inset-top)] pb-2"
-      >
-        <ChannelPlayer
-          channel={selectedChannel}
-          notice={notice}
-          attemptToken={attemptToken}
-          onPlaybackWorking={handlePlaybackWorking}
-          onPlaybackFailed={handlePlaybackFailed}
-          onPlaybackActiveChange={handlePlaybackActiveChange}
-          onTryAnotherChannel={handleTryAnotherChannel}
-          onRetry={handleRetry}
-        />
-      </div>
-
-      <section className="[grid-area:main] min-w-0">
-        {tester.isOffline && (
-          <div
-            role="status"
-            className="mb-4 rounded-xl border border-amber-400/30 bg-amber-400/10 px-4 py-2 text-xs text-amber-200"
-          >
-            You are offline — channel testing is paused and streams may not
-            load. Checking your connection...
-          </div>
-        )}
-
-        <div className="mb-5">
-          <p className="mb-2 text-xs font-bold tracking-[0.25em] text-red-400 uppercase">
-            Your sports destination
-          </p>
-
-          <h1 className="text-3xl font-black sm:text-4xl">Watch Sports Live</h1>
-
-          <p className="mt-2 text-sm text-zinc-400">
-            Working channels are found and kept for you automatically.
-          </p>
+    <div className="space-y-4">
+      {tester.isOffline && (
+        <div
+          role="status"
+          className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2 text-xs text-amber-600 dark:text-amber-200"
+        >
+          You are offline — channel testing is paused and streams may not
+          load. Checking your connection...
         </div>
+      )}
 
-        <ChannelHealth
-          counts={tester.counts}
-          isTesting={tester.isTesting}
-          disabled={loading || tester.counts.total === 0}
-          onRetestAll={handleRetestAll}
-        />
+      {/* 1. TOP BAR: CHANNEL HEALTH CHECKER (COMPACT & MODERN) */}
+      <ChannelHealth
+        counts={tester.counts}
+        isTesting={tester.isTesting}
+        disabled={loading || tester.counts.total === 0}
+        onRetestAll={handleRetestAll}
+      />
+
+      {/* 2. SECOND ROW: SELECT SERVER & SEARCH CHANNELS (SAME LINE) */}
+      <section className="glass-panel rounded-xl p-2.5 border border-border">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+          {/* Select Server Chips */}
+          <div className="md:col-span-8">
+            <ServerSelector
+              servers={servers}
+              selectedServerId={server.id}
+              onSelect={onSelectServer}
+            />
+          </div>
+
+          {/* Channel Search Input */}
+          <div className="md:col-span-4 relative">
+            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+            <input
+              type="text"
+              id="channelSearchInput"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search channels..."
+              autoComplete="off"
+              enterKeyHint="search"
+              className="w-full pl-9 pr-8 py-3 bg-background border border-border focus:border-red-500 rounded-lg text-sm text-foreground placeholder:text-muted-foreground outline-none transition"
+              aria-label="Search channels"
+            />
+            {search && (
+              <button
+                type="button"
+                onClick={() => setSearch("")}
+                aria-label="Clear search"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+        </div>
       </section>
 
-      <aside className="[grid-area:aside] min-w-0">
-        <ServerSelector
-          servers={servers}
-          selectedServerId={server.id}
-          onSelect={onSelectServer}
-        />
+      {/* 3. MAIN CONTENT: VIDEO PLAYER (LEFT) + CHANNELS SIDEBAR (RIGHT) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        {/* VIDEO PLAYER (70% Width / 8 Cols) */}
+        <div className="lg:col-span-9 flex flex-col space-y-2">
+          <ChannelPlayer
+            channel={selectedChannel}
+            notice={notice}
+            attemptToken={attemptToken}
+            onPlaybackWorking={handlePlaybackWorking}
+            onPlaybackFailed={handlePlaybackFailed}
+            onPlaybackActiveChange={handlePlaybackActiveChange}
+            onTryAnotherChannel={handleTryAnotherChannel}
+            onRetry={handleRetry}
+          />
+        </div>
 
-        <ChannelBrowser
-          channels={channels}
-          workingChannels={tester.workingChannels}
-          visibleCount={tester.visibleCount}
-          isDone={tester.isDone}
-          isScanning={tester.isScanning}
-          scanBoosted={tester.scanBoosted}
-          statuses={tester.statuses}
-          search={search}
-          onSearchChange={setSearch}
-          onLoadMore={tester.loadMore}
-          onBoostScan={tester.boostScan}
-          onRetestAll={handleRetestAll}
-          loading={loading}
-          error={error}
-          serverName={server.name}
-          selectedChannelId={selectedChannel?.id ?? rememberedChannelId}
-          onSelect={handleSelect}
-        />
-      </aside>
+        {/* CHANNELS SIDEBAR (30% Width / 4 Cols) */}
+        <div className="lg:col-span-3 flex flex-col space-y-2">
+          <ChannelBrowser
+            channels={channels}
+            workingChannels={tester.workingChannels}
+            visibleCount={tester.visibleCount}
+            isDone={tester.isDone}
+            isScanning={tester.isScanning}
+            scanBoosted={tester.scanBoosted}
+            statuses={tester.statuses}
+            search={search}
+            onLoadMore={tester.loadMore}
+            onBoostScan={tester.boostScan}
+            onRetestAll={handleRetestAll}
+            loading={loading}
+            error={error}
+            serverName={server.name}
+            selectedChannelId={selectedChannel?.id ?? rememberedChannelId}
+            onSelect={handleSelect}
+          />
+        </div>
+      </div>
     </div>
   )
 }
+

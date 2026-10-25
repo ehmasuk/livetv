@@ -6,7 +6,7 @@
   url: string
 }
 
-export type ChannelStatus = "working" | "failed" | "testing" | "unsupported"
+export type ChannelStatus = "working" | "failed" | "testing"
 
 export type ServerCategory = "all" | "sports"
 

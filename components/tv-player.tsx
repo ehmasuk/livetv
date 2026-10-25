@@ -2623,9 +2623,9 @@ export function TVPlayer({
   return (
     <div
       ref={containerRef}
-      className="w-full overflow-hidden rounded-2xl border border-white/10 bg-black"
+      className="w-full overflow-hidden rounded-2xl border border-border bg-background shadow-lg"
     >
-      <div className="relative aspect-video bg-black">
+      <div className="relative aspect-video bg-background">
         <video
           key={`player-${reloadToken}`}
           ref={videoRef}
@@ -2637,12 +2637,12 @@ export function TVPlayer({
         />
 
         {!hasStarted && !error && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-zinc-900/50 to-black/80">
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-muted/40 to-background/80">
             <button
               type="button"
               onClick={startPlayback}
               aria-label={`Play ${channelName}`}
-              className="group flex h-20 w-20 items-center justify-center rounded-full border border-white/30 bg-red-600 text-white shadow-xl shadow-red-600/20 transition duration-200 hover:scale-110 hover:bg-red-500 focus:ring-4 focus:ring-red-400/50 focus:outline-none sm:h-24 sm:w-24"
+              className="group flex h-20 w-20 items-center justify-center rounded-full border border-border/50 bg-red-600 text-white shadow-xl shadow-red-600/20 transition duration-200 hover:scale-110 hover:bg-red-500 focus:ring-4 focus:ring-red-400/50 focus:outline-none sm:h-24 sm:w-24"
             >
               <svg
                 viewBox="0 0 24 24"
@@ -2654,21 +2654,21 @@ export function TVPlayer({
               </svg>
             </button>
 
-            <p className="mt-5 text-sm font-semibold text-white">
+            <p className="mt-5 text-sm font-semibold text-foreground">
               Watch {channelName}
             </p>
-            <p className="mt-1 text-xs text-zinc-400">
+            <p className="mt-1 text-xs text-muted-foreground">
               Click to start streaming
             </p>
           </div>
         )}
 
         {prepare && !error && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 px-6">
-            <p className="text-sm font-medium text-white">
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/60 px-6">
+            <p className="text-sm font-medium text-foreground">
               Preparing stream...
             </p>
-            <div className="mt-4 h-1.5 w-56 overflow-hidden rounded-full bg-white/15 sm:w-64">
+            <div className="mt-4 h-1.5 w-56 overflow-hidden rounded-full bg-muted/50 sm:w-64">
               <div
                 className="h-full rounded-full bg-red-500 transition-[width] duration-300"
                 style={{
@@ -2676,7 +2676,7 @@ export function TVPlayer({
                 }}
               />
             </div>
-            <p className="mt-2 text-xs text-zinc-400">
+            <p className="mt-2 text-xs text-muted-foreground">
               {Math.round(prepare.progress * 100)}% buffered
             </p>
 
@@ -2699,8 +2699,8 @@ export function TVPlayer({
           !awaitingResume &&
           !prepare &&
           !needsTapToPlay && (
-            <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center bg-black/60">
-              <div className="h-10 w-10 animate-spin rounded-full border-4 border-white/20 border-t-red-500" />
+            <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center bg-background/60">
+              <div className="h-10 w-10 animate-spin rounded-full border-4 border-border/50 border-t-red-500" />
               <p className="mt-4 text-sm text-white">Buffering...</p>
             </div>
           )}
@@ -2714,27 +2714,27 @@ export function TVPlayer({
           !awaitingResume &&
           !prepare &&
           !needsTapToPlay && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60">
-              <div className="h-10 w-10 animate-spin rounded-full border-4 border-white/20 border-t-red-500" />
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/60">
+              <div className="h-10 w-10 animate-spin rounded-full border-4 border-border/50 border-t-red-500" />
               <p className="mt-4 text-sm text-white">Connecting to stream...</p>
             </div>
           )}
 
         {isReconnecting && hasStarted && !error && !needsTapToPlay && (
-          <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/60">
-            <div className="h-10 w-10 animate-spin rounded-full border-4 border-white/20 border-t-red-500" />
+          <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/60">
+            <div className="h-10 w-10 animate-spin rounded-full border-4 border-border/50 border-t-red-500" />
             <p className="mt-4 text-sm text-white">Reconnecting...</p>
           </div>
         )}
 
         {awaitingResume && hasStarted && !error && (
-          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/70 p-6 text-center">
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/70 p-6 text-center">
             <Play
-              className="h-6 w-6 text-zinc-300"
+              className="h-6 w-6 text-muted-foreground"
               aria-hidden="true"
               strokeWidth={2.5}
             />
-            <p className="mt-3 text-sm font-medium text-white">
+            <p className="mt-3 text-sm font-medium text-foreground">
               Stream paused
             </p>
             <button
@@ -2748,12 +2748,12 @@ export function TVPlayer({
         )}
 
         {needsTapToPlay && !error && (
-          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/80 p-6 text-center">
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/80 p-6 text-center">
             <button
               type="button"
               onClick={handleTapToPlay}
               aria-label={`Play ${channelName}`}
-              className="group flex h-20 w-20 items-center justify-center rounded-full border border-white/30 bg-red-600 text-white shadow-xl shadow-red-600/20 transition duration-200 hover:scale-110 hover:bg-red-500 focus:ring-4 focus:ring-red-400/50 focus:outline-none sm:h-24 sm:w-24"
+              className="group flex h-20 w-20 items-center justify-center rounded-full border border-border/50 bg-red-600 text-white shadow-xl shadow-red-600/20 transition duration-200 hover:scale-110 hover:bg-red-500 focus:ring-4 focus:ring-red-400/50 focus:outline-none sm:h-24 sm:w-24"
             >
               <svg
                 viewBox="0 0 24 24"
@@ -2765,14 +2765,14 @@ export function TVPlayer({
               </svg>
             </button>
 
-            <p className="mt-5 text-sm font-semibold text-white">
+            <p className="mt-5 text-sm font-semibold text-foreground">
               Tap to play
             </p>
           </div>
         )}
 
         {error && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/90 p-6 text-center">
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/90 p-6 text-center">
             <p className="max-w-md text-sm text-red-300">{error}</p>
 
             <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
@@ -2788,7 +2788,7 @@ export function TVPlayer({
                 <button
                   type="button"
                   onClick={onTryAnotherChannel}
-                  className="flex min-h-[44px] items-center rounded-lg bg-white/10 px-5 text-sm font-semibold text-white transition hover:bg-white/15"
+                  className="flex min-h-[44px] items-center rounded-lg bg-muted/50 px-5 text-sm font-semibold text-foreground transition hover:bg-muted/30"
                 >
                   Try another channel
                 </button>
@@ -2851,18 +2851,18 @@ export function TVPlayer({
         </div>
       )}
 
-      <div className="flex items-center gap-2 px-4 py-3">
+      <div className="flex items-center gap-2 px-4 py-3 border-t border-border/80">
         <span
           className={cn(
             "h-2 w-2 rounded-full",
-            isPlaying ? "animate-pulse bg-red-500" : "bg-zinc-500"
+            isPlaying ? "animate-pulse bg-red-500" : "bg-muted-foreground"
           )}
         />
-        <span className="truncate text-sm font-medium text-white">
+        <span className="truncate text-sm font-medium text-foreground">
           {channelName}
         </span>
 
-        <span className="ml-auto text-xs text-zinc-400">
+        <span className="ml-auto text-xs text-muted-foreground">
           {isPlaying ? "LIVE" : isLoading ? "LOADING" : "READY"}
         </span>
 
@@ -2871,7 +2871,7 @@ export function TVPlayer({
             value={qualityValue}
             onChange={(event) => handleQualityChange(event.target.value)}
             aria-label="Quality"
-            className="h-11 w-24 rounded-lg border border-white/10 bg-[#15151b] px-2 text-xs text-white outline-none focus:border-red-500"
+            className="h-11 w-24 rounded-lg border border-border bg-input px-2 text-xs text-foreground outline-none focus:border-red-500"
           >
             <option value="auto">Auto</option>
             <option value="saver">Data saver</option>
@@ -2888,7 +2888,7 @@ export function TVPlayer({
             type="button"
             onClick={togglePictureInPicture}
             aria-label="Picture in picture"
-            className="flex h-11 w-11 items-center justify-center rounded-lg text-zinc-300 transition hover:bg-white/10 hover:text-white"
+            className="flex h-11 w-11 items-center justify-center rounded-lg text-muted-foreground transition hover:bg-muted/50 hover:text-foreground"
           >
             <PictureInPicture className="h-5 w-5" aria-hidden="true" />
           </button>
