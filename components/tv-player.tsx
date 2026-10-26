@@ -2914,7 +2914,7 @@ export function TVPlayer({
               onClick={() => setBanner(null)}
               variant="ghost"
               size="xs"
-              className="flex min-h-[32px] items-center px-2 text-xs text-zinc-400 transition hover:text-white"
+              className="flex min-h-8 items-center px-2 text-xs text-zinc-400 transition hover:text-white"
             >
               Dismiss
             </Button>
@@ -2926,7 +2926,7 @@ export function TVPlayer({
         <span
           className={cn(
             "h-2 w-2 rounded-full",
-            isPlaying ? "animate-pulse bg-red-500" : "bg-muted-foreground"
+            isPlaying ? "animate-pulse bg-green-500" : "bg-muted-foreground"
           )}
         />
         <span className="truncate text-sm font-medium text-foreground">

@@ -3,9 +3,10 @@
 import { ChannelListItem } from "@/components/home/channel-list-item"
 import { matchesSearch } from "@/lib/channels"
 import type { Channel, ChannelStatus } from "@/lib/types"
-import { Search, ServerIcon, X } from "lucide-react"
+import { ServerIcon } from "lucide-react"
 import { useEffect, useMemo, useRef } from "react"
 import { Button } from "@/components/ui/button"
+import { ChannelSearch } from "@/components/home/channel-search"
 
 const SKELETON_ROW_COUNT = 6
 
@@ -185,31 +186,13 @@ export function ChannelBrowser({
       {/* Mobile-only search, directly above the channel list so it stays close
           to the channels instead of sitting above the player. */}
       {onSearchChange && (
-        <div className="relative mb-2 md:hidden">
-          <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
-          <input
-            type="search"
-            value={search}
-            onChange={(event) => onSearchChange(event.target.value)}
-            placeholder="Search channels..."
-            autoComplete="off"
-            enterKeyHint="search"
-            className="w-full pl-9 pr-8 py-2.5 dark:bg-background bg-white border border-border focus:border-red-500 rounded-lg text-sm text-foreground placeholder:text-muted-foreground outline-none transition"
-            aria-label="Search channels"
-          />
-          {search && (
-            <Button
-              type="button"
-              onClick={() => onSearchChange("")}
-              aria-label="Clear search"
-              variant="ghost"
-              size="icon-sm"
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition p-1"
-            >
-              <X className="w-3.5 h-3.5" />
-            </Button>
-          )}
-        </div>
+        <ChannelSearch
+          value={search}
+          onChange={onSearchChange}
+          type="search"
+          className="w-full pl-9 pr-8 py-2.5 dark:bg-background bg-white border border-border focus:border-red-500 rounded-lg text-sm text-foreground placeholder:text-muted-foreground outline-none transition"
+          containerClassName="mb-2 md:hidden"
+        />
       )}
 
       {/* Channel Cards List Container */}

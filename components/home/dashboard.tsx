@@ -1,8 +1,8 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
-import { Search, X } from "lucide-react"
 import { ChannelBrowser } from "@/components/home/channel-browser"
+import { ChannelSearch } from "@/components/home/channel-search"
 import { ChannelHealth } from "@/components/home/channel-health"
 import { ChannelPlayer } from "@/components/home/channel-player"
 import type { PlaybackNotice } from "@/components/home/channel-player"
@@ -10,7 +10,6 @@ import { ServerSelector } from "@/components/home/server-selector"
 import { useChannels } from "@/hooks/use-channels"
 import { useLazyStreamTester } from "@/hooks/use-lazy-stream-tester"
 import { readSessionPrefs, writeSessionPrefs } from "@/lib/prefs"
-import { Button } from "@/components/ui/button"
 import type { Channel, ServerOption } from "@/lib/types"
 
 type DashboardProps = {
@@ -238,31 +237,13 @@ export function Dashboard({ server, servers, onSelectServer }: DashboardProps) {
 
           {/* Channel Search Input — desktop only; mobile search lives above
               the channel list in ChannelBrowser. */}
-          <div className="hidden md:block md:col-span-4 relative">
-            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
-            <input
-              type="text"
-              id="channelSearchInput"
+          <div className="hidden md:block md:col-span-4">
+            <ChannelSearch
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search channels..."
-              autoComplete="off"
-              enterKeyHint="search"
+              onChange={setSearch}
+              id="channelSearchInput"
               className="w-full pl-9 pr-8 py-3 bg-background border border-border focus:border-red-500 rounded-lg text-sm text-foreground placeholder:text-muted-foreground outline-none transition"
-              aria-label="Search channels"
             />
-            {search && (
-              <Button
-                type="button"
-                onClick={() => setSearch("")}
-                aria-label="Clear search"
-                variant="ghost"
-                size="icon-sm"
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition p-1"
-              >
-                <X className="w-3.5 h-3.5" />
-              </Button>
-            )}
           </div>
         </div>
       </section>
