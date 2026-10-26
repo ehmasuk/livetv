@@ -13,6 +13,7 @@
     "description": "Mrgify BDIX mixed playlist",
     "enabled": true,
     "category": "all",
-    "url": "https://raw.githubusercontent.com/abusaeeidx/Mrgify-BDIX-IPTV/main/playlist.m3u"
+    "url": "https://raw.githubusercontent.com/abusaeeidx/Mrgify-BDIX-IPTV/main/playlist.m3u",
+    "default":true
   }
 ]

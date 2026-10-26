@@ -213,12 +213,15 @@ export function Dashboard({ server, servers, onSelectServer }: DashboardProps) {
       )}
 
       {/* 1. TOP BAR: CHANNEL HEALTH CHECKER (COMPACT & MODERN) */}
-      <ChannelHealth
-        counts={tester.counts}
-        isTesting={tester.isTesting}
-        disabled={loading || tester.counts.total === 0}
-        onRetestAll={handleRetestAll}
-      />
+      {/* Hidden on small devices; shows from medium screens and up */}
+      <div className="hidden md:block">
+        <ChannelHealth
+          counts={tester.counts}
+          isTesting={tester.isTesting}
+          disabled={loading || tester.counts.total === 0}
+          onRetestAll={handleRetestAll}
+        />
+      </div>
 
       {/* 2. SECOND ROW: SELECT SERVER & SEARCH CHANNELS (SAME LINE) */}
       <section className="glass-panel rounded-xl p-2.5 border border-border">

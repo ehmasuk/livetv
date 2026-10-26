@@ -16,6 +16,8 @@ export type ServerConfig = {
   description: string
   category: ServerCategory
   enabled: boolean
+  /** When true, this server is selected by default on first visit. */
+  default?: boolean
   url: string
 }
 

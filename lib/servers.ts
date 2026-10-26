@@ -53,9 +53,11 @@ function assertValidServers(config: ServerConfig[]) {
 
 assertValidServers(servers)
 
-/** The first enabled server is used when a request does not specify one. */
+/** The server marked `default: true` in config, else the first enabled server. */
 export const DEFAULT_SERVER_ID =
-  servers.find((server) => server.enabled)?.id ?? ""
+  servers.find((server) => server.enabled && server.default === true)?.id ??
+  servers.find((server) => server.enabled)?.id ??
+  ""
 
 export function getServerById(id: string | null | undefined) {
   if (!id) return undefined

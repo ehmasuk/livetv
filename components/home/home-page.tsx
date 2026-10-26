@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react"
 import { Dashboard } from "@/components/home/dashboard"
+import { DEFAULT_SERVER_ID } from "@/lib/servers"
 import { readSessionPrefs, writeSessionPrefs } from "@/lib/prefs"
 import type { ServerOption } from "@/lib/types"
 
@@ -10,7 +11,9 @@ type HomePageProps = {
 }
 
 export function HomePage({ servers }: HomePageProps) {
-  const [selectedServerId, setSelectedServerId] = useState(servers[0]?.id ?? "")
+  const [selectedServerId, setSelectedServerId] = useState(
+    DEFAULT_SERVER_ID || (servers[0]?.id ?? "")
+  )
 
   // Restore the last used server after mount: the first paint stays
   // identical to the server-rendered markup, then the choice is restored.

@@ -2680,7 +2680,7 @@ export function TVPlayer({
               {Math.round(prepare.progress * 100)}% buffered
             </p>
 
-            {prepare.playNow && (
+            {prepare.playNow && !isBuffering && (
               <button
                 type="button"
                 onClick={handlePlayNow}

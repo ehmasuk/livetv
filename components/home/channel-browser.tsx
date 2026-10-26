@@ -193,7 +193,7 @@ export function ChannelBrowser({
             placeholder="Search channels..."
             autoComplete="off"
             enterKeyHint="search"
-            className="w-full pl-9 pr-8 py-2.5 bg-background border border-border focus:border-red-500 rounded-lg text-sm text-foreground placeholder:text-muted-foreground outline-none transition"
+            className="w-full pl-9 pr-8 py-2.5 dark:bg-background bg-white border border-border focus:border-red-500 rounded-lg text-sm text-foreground placeholder:text-muted-foreground outline-none transition"
             aria-label="Search channels"
           />
           {search && (
