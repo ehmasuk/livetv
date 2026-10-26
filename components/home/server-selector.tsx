@@ -18,7 +18,7 @@ export function ServerSelector({
 }: ServerSelectorProps) {
   return (
     <div className="flex items-center gap-2 overflow-x-auto py-0.5 scrollbar-none flex-wrap">
-      <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground shrink-0 mr-2 flex items-center gap-1.5">
+      <span className="text-caption font-bold uppercase tracking-wider text-muted-foreground shrink-0 mr-2 flex items-center gap-1.5">
         <Server className="w-3.5 h-3.5 text-red-500" /> Source
       </span>
 

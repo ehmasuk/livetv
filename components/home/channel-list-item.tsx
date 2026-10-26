@@ -67,7 +67,7 @@ export const ChannelListItem = memo(function ChannelListItem({
       <div className="flex items-center gap-3 min-w-0">
         <div
           className={cn(
-            "w-9 h-9 shrink-0 rounded-xl flex items-center justify-center text-[11px] font-bold overflow-hidden",
+            "w-9 h-9 shrink-0 rounded-xl flex items-center justify-center text-caption font-bold overflow-hidden",
             selected
               ? "bg-red-500 text-white"
               : "bg-muted/50 text-muted-foreground"
@@ -101,7 +101,7 @@ export const ChannelListItem = memo(function ChannelListItem({
             {channel.name}
           </div>
           {channel.group && channel.group !== "Uncategorized" && (
-            <div className="text-[10px] text-muted-foreground/90 truncate mt-0.5 uppercase tracking-wider font-medium">
+            <div className="text-caption text-muted-foreground/90 truncate mt-0.5 uppercase tracking-wider font-medium">
               {channel.group}
             </div>
           )}

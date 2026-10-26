@@ -43,7 +43,7 @@ export function ChannelHealth({
               </TooltipTrigger>
               <TooltipContent
                 side="top"
-                className="w-72 text-[11px] leading-relaxed"
+                className="w-72 text-caption leading-relaxed"
               >
                 Channels are checked regularly to make sure they work.
                 Unavailable channels are filtered out, and results are saved to
@@ -56,7 +56,7 @@ export function ChannelHealth({
         {/* Right: Modern Stats Pills + Retest Button */}
         <div className="flex w-full flex-wrap items-center justify-between gap-3 md:w-auto">
           <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/50 px-3 py-1.5">
-            <span className="text-[10px] font-semibold text-muted-foreground uppercase">
+            <span className="text-caption font-semibold text-muted-foreground uppercase">
               Total:
             </span>
             <span className="text-sm font-extrabold text-foreground">
@@ -65,7 +65,7 @@ export function ChannelHealth({
           </div>
 
           <div className="flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-3 py-1.5 dark:bg-emerald-950/30">
-            <span className="text-[10px] font-semibold text-emerald-600 uppercase dark:text-emerald-400">
+            <span className="text-caption font-semibold text-emerald-600 uppercase dark:text-emerald-400">
               Working:
             </span>
             <span className="text-sm font-extrabold text-emerald-600 dark:text-emerald-400">
@@ -74,7 +74,7 @@ export function ChannelHealth({
           </div>
 
           <div className="flex items-center gap-2 rounded-lg border border-rose-500/20 bg-rose-500/10 px-3 py-1.5 dark:bg-rose-950/30">
-            <span className="text-[10px] font-semibold text-rose-600 uppercase dark:text-rose-400">
+            <span className="text-caption font-semibold text-rose-600 uppercase dark:text-rose-400">
               Failed:
             </span>
             <span className="text-sm font-extrabold text-rose-600 dark:text-rose-400">
@@ -83,7 +83,7 @@ export function ChannelHealth({
           </div>
 
           <div className="flex items-center gap-2 rounded-lg border border-amber-500/20 bg-amber-500/10 px-3 py-1.5 dark:bg-amber-950/30">
-            <span className="text-[10px] font-semibold text-amber-600 uppercase dark:text-amber-400">
+            <span className="text-caption font-semibold text-amber-600 uppercase dark:text-amber-400">
               Untested:
             </span>
             <span className="text-sm font-extrabold text-amber-600 dark:text-amber-400">

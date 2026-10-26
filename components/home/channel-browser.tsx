@@ -192,11 +192,11 @@ export function ChannelBrowser({
         <div className="flex items-center justify-between px-3 py-2">
           <span className="flex items-center gap-2 text-xs font-bold tracking-wider text-foreground uppercase">
             Channels
-            <span className="rounded-md bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+            <span className="rounded-md bg-emerald-500/10 px-2 py-0.5 text-caption font-bold text-emerald-600 dark:text-emerald-400">
               {matchedChannels.length}
             </span>
           </span>
-          <span className="flex max-w-40 items-center gap-2 truncate text-[11px] text-muted-foreground">
+          <span className="flex max-w-40 items-center gap-2 truncate text-caption text-muted-foreground">
             <ServerIcon className="size-3.5" /> {serverName}
           </span>
         </div>
@@ -233,7 +233,7 @@ export function ChannelBrowser({
             <p className="text-sm font-semibold text-foreground mb-2">
               No working channels were found.
             </p>
-            <p className="mx-auto max-w-xs text-[11px] text-muted-foreground mb-6">
+            <p className="mx-auto max-w-xs text-caption text-muted-foreground mb-6">
               Streams may block browser access or may not be available in your
               region.
             </p>
