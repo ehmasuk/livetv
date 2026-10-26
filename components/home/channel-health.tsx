@@ -43,7 +43,7 @@ export function ChannelHealth({
               </TooltipTrigger>
               <TooltipContent
                 side="top"
-                className="w-72 text-caption leading-relaxed"
+                className="w-72 text-caption leading-relaxed dark:text-black text-white"
               >
                 Channels are checked regularly to make sure they work.
                 Unavailable channels are filtered out, and results are saved to
