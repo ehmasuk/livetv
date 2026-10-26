@@ -1,5 +1,6 @@
 "use client"
 
+import { Button } from "@/components/ui/button"
 import {
   Tooltip,
   TooltipContent,
@@ -92,16 +93,18 @@ export function ChannelHealth({
         </div>
 
         {/* Retest Button */}
-        <button
+        <Button
           type="button"
           onClick={onRetestAll}
           disabled={disabled || isTesting}
           aria-label="Retest all channels"
-          className="flex items-center gap-1.5 rounded-lg bg-red-600 px-3 py-1 text-xs font-bold text-white shadow-md shadow-red-600/20 transition hover:bg-red-500 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+          variant="secondary"
+          size="sm"
+          className="bg-red-600 text-white hover:bg-red-500"
         >
           <RotateCw className={cn("h-3 w-3", isTesting && "animate-spin")} />
           <span>Retest channels</span>
-        </button>
+        </Button>
       </div>
     </section>
   )

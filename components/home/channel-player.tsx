@@ -2,6 +2,7 @@
 
 import { Play } from "lucide-react"
 import dynamic from "next/dynamic"
+import { Button } from "@/components/ui/button"
 import type { Channel } from "@/lib/types"
 
 /**
@@ -69,15 +70,15 @@ export function ChannelPlayer({
     return (
       <div className="w-full overflow-hidden rounded-2xl border border-border bg-background shadow-lg flex flex-col">
         {/* Relative aspect-video screen matching real player */}
-        <div className="relative aspect-video player-grid-bg flex flex-col items-center justify-center p-6 text-center select-none">
-          <div className="flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-full bg-card/90 border border-border/80 text-muted-foreground shadow-lg transition-transform duration-200 hover:scale-105">
+        <div className="relative aspect-video dark:bg-slate-900 bg-black flex flex-col items-center justify-center p-6 text-center select-none">
+          <div className="flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-full bg-card/90 border border-border/80 dark:text-muted-foreground shadow transition-transform duration-200 hover:scale-105">
             <Play className="h-7 w-7 sm:h-8 sm:w-8 fill-current ml-1" />
           </div>
 
-          <p className="mt-4 text-sm sm:text-base font-semibold text-foreground">
+          <p className="mt-4 text-sm sm:text-base font-semibold text-white/80 dark:text-accent-foreground">
             Select a channel to begin
           </p>
-          <p className="mt-1 text-xs text-muted-foreground">
+          <p className="mt-1 text-xs text-white/80 dark:text-accent-foreground">
             Choose a stream from the live channels library
           </p>
         </div>
@@ -106,13 +107,15 @@ export function ChannelPlayer({
           <p className="text-sm text-red-500 dark:text-red-200">{notice.text}</p>
 
           {notice.terminal && (
-            <button
+            <Button
               type="button"
               onClick={onRetry}
-              className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-red-500"
+              variant="destructive"
+              size="sm"
+              className="bg-red-600 rounded-lg px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-500"
             >
               Try again
-            </button>
+            </Button>
           )}
         </div>
       )}

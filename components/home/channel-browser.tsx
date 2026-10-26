@@ -5,6 +5,7 @@ import { matchesSearch } from "@/lib/channels"
 import type { Channel, ChannelStatus } from "@/lib/types"
 import { Search, ServerIcon, X } from "lucide-react"
 import { useEffect, useMemo, useRef } from "react"
+import { Button } from "@/components/ui/button"
 
 const SKELETON_ROW_COUNT = 6
 
@@ -197,14 +198,16 @@ export function ChannelBrowser({
             aria-label="Search channels"
           />
           {search && (
-            <button
+            <Button
               type="button"
               onClick={() => onSearchChange("")}
               aria-label="Clear search"
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition"
+              variant="ghost"
+              size="icon-sm"
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition p-1"
             >
               <X className="w-3.5 h-3.5" />
-            </button>
+            </Button>
           )}
         </div>
       )}
@@ -263,13 +266,15 @@ export function ChannelBrowser({
               Streams may block browser access or may not be available in your
               region.
             </p>
-            <button
+            <Button
               type="button"
               onClick={onRetestAll}
+              variant="destructive"
+              size="sm"
               className="mt-3 inline-flex items-center rounded-lg bg-red-600 px-4 py-1.5 text-xs font-bold text-white transition hover:bg-red-500"
             >
               Retest
-            </button>
+            </Button>
           </div>
         )}
 
@@ -320,13 +325,14 @@ export function ChannelBrowser({
                 </span>
 
                 {!scanBoosted && (
-                  <button
+                  <Button
                     type="button"
                     onClick={onBoostScan}
-                    className="font-semibold text-red-500 transition hover:underline"
+                    variant="link"
+                    className="font-semibold text-red-500 transition hover:underline px-0 py-0"
                   >
                     Check all now
-                  </button>
+                  </Button>
                 )}
               </div>
             )}

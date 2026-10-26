@@ -44,8 +44,7 @@ export const ChannelListItem = memo(function ChannelListItem({
   const showLogo = Boolean(channel.logo) && !logoFailed
 
   return (
-    <button
-      type="button"
+    <div
       onClick={() => onSelect(channel)}
       aria-pressed={selected}
       aria-label={`${channel.name}, ${channel.group}, ${statusLabel}`}
@@ -106,7 +105,7 @@ export const ChannelListItem = memo(function ChannelListItem({
           STATUS_DOT_CLASSES[status ?? "untested"]
         )}
       />
-    </button>
+    </div>
   )
 })
 

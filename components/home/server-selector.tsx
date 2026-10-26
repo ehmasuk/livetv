@@ -2,6 +2,7 @@
 
 import { Radio, Server, Wifi } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
 import type { ServerOption } from "@/lib/types"
 
 type ServerSelectorProps = {
@@ -26,7 +27,7 @@ export function ServerSelector({
         const Icon = index % 2 === 0 ? Radio : Wifi
 
         return (
-          <button
+          <Button
             type="button"
             key={server.id}
             onClick={() => onSelect(server.id)}
@@ -46,7 +47,7 @@ export function ServerSelector({
                 active ? "bg-red-500 animate-pulse" : "bg-muted-foreground/40"
               )}
             />
-          </button>
+          </Button>
         )
       })}
     </div>

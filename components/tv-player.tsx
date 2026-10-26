@@ -1,8 +1,7 @@
 "use client"
 
-import { Maximize, Minimize, PictureInPicture, Play } from "lucide-react"
-import Hls, { type ErrorData, type Level } from "hls.js"
-import { useCallback, useEffect, useRef, useState } from "react"
+import { Button } from "@/components/ui/button"
+import { useWakeLock } from "@/hooks/use-wake-lock"
 import {
   PLAYER_ACTION_GRACE_MS,
   PLAYER_BUFFERING_DELAY_MS,
@@ -50,8 +49,10 @@ import {
   writeQualityChoice,
   type QualityChoice,
 } from "@/lib/prefs"
-import { useWakeLock } from "@/hooks/use-wake-lock"
 import { cn } from "@/lib/utils"
+import Hls, { type ErrorData, type Level } from "hls.js"
+import { Maximize, Minimize, PictureInPicture, Play } from "lucide-react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 type TVPlayerProps = {
   src: string
@@ -604,7 +605,9 @@ export function TVPlayer({
       target = PLAYER_PREBUFFER_TARGET_NATIVE_S
     }
 
-    debugLog(`prepare hold started, target=${target}s / saved=${savedEstimate ?? "none"}`)
+    debugLog(
+      `prepare hold started, target=${target}s / saved=${savedEstimate ?? "none"}`
+    )
 
     prebufferRef.current = {
       active: true,
@@ -619,18 +622,16 @@ export function TVPlayer({
     // our own pause() (AbortError — swallowed); the gesture credit stays.
     intentionalPauseRef.current = true
 
-    video
-      .play()
-      .catch((err: unknown) => {
-        if (isAbortError(err)) return
+    video.play().catch((err: unknown) => {
+      if (isAbortError(err)) return
 
-        debugLog(`startup play rejected: ${String(err)}`)
+      debugLog(`startup play rejected: ${String(err)}`)
 
-        // Autoplay policy wants a visible tap: offer it, do not fail.
-        setIsLoading(false)
-        setNeedsTapToPlay(true)
-        cancelPrebufferHold()
-      })
+      // Autoplay policy wants a visible tap: offer it, do not fail.
+      setIsLoading(false)
+      setNeedsTapToPlay(true)
+      cancelPrebufferHold()
+    })
 
     video.pause()
   }, [cancelPrebufferHold])
@@ -692,10 +693,14 @@ export function TVPlayer({
           orientation?.lock?.("landscape").catch(() => {})
         })
         .catch(() => {
-          ;(videoRef.current as WebkitFullscreenVideo | null)?.webkitEnterFullscreen?.()
+          ;(
+            videoRef.current as WebkitFullscreenVideo | null
+          )?.webkitEnterFullscreen?.()
         })
     } catch {
-      ;(videoRef.current as WebkitFullscreenVideo | null)?.webkitEnterFullscreen?.()
+      ;(
+        videoRef.current as WebkitFullscreenVideo | null
+      )?.webkitEnterFullscreen?.()
     }
   }, [])
 
@@ -955,7 +960,9 @@ export function TVPlayer({
       const behind = target - video.currentTime
       if (behind <= PLAYER_LIVE_BEHIND_MAX_S) return false
 
-      debugLog(`${why}: ${behind.toFixed(1)}s behind live — seeking to the edge`)
+      debugLog(
+        `${why}: ${behind.toFixed(1)}s behind live — seeking to the edge`
+      )
 
       try {
         video.currentTime = target
@@ -1040,7 +1047,9 @@ export function TVPlayer({
 
       // The user forced playback (native controls): honor it, stop waiting.
       if (!video.paused) {
-        debugLog(`prepare hold: play forced externally, ${ahead.toFixed(2)}s ahead`)
+        debugLog(
+          `prepare hold: play forced externally, ${ahead.toFixed(2)}s ahead`
+        )
         stopPrebufferHold()
         return
       }
@@ -1072,7 +1081,11 @@ export function TVPlayer({
       ) {
         pre.targetAdjusted = true
 
-        if (dropQualityOneLevel(`prebuffer ${Math.round(ahead)}s of ${pre.target}s`)) {
+        if (
+          dropQualityOneLevel(
+            `prebuffer ${Math.round(ahead)}s of ${pre.target}s`
+          )
+        ) {
           pre.dropped = true
           actionGraceUntilRef.current = now + PLAYER_ACTION_GRACE_MS
         }
@@ -1093,7 +1106,9 @@ export function TVPlayer({
 
       // A play we did not start (user hit the native control) wins.
       if (!video.paused) {
-        debugLog(`rebuffer interrupted by external play, ${ahead.toFixed(2)}s ahead`)
+        debugLog(
+          `rebuffer interrupted by external play, ${ahead.toFixed(2)}s ahead`
+        )
         exitRebuffer()
         return
       }
@@ -1445,7 +1460,9 @@ export function TVPlayer({
     }
 
     const handleFreezeEpisode = (now: number) => {
-      debugLog(`freeze episode ${freezeStreak + 1} confirmed, ${videoFacts(video)}`)
+      debugLog(
+        `freeze episode ${freezeStreak + 1} confirmed, ${videoFacts(video)}`
+      )
       pauseReconnectReset("playhead freeze")
 
       if (freezeStreak === 0) {
@@ -1619,7 +1636,9 @@ export function TVPlayer({
 
       if (rung === 3) {
         if (usingHls) {
-          debugLog(`frame freeze rung 3: recoverMediaError, ${videoFacts(video)}`)
+          debugLog(
+            `frame freeze rung 3: recoverMediaError, ${videoFacts(video)}`
+          )
 
           try {
             hls?.recoverMediaError()
@@ -1627,7 +1646,9 @@ export function TVPlayer({
             // The restart rung still follows if this was ineffective.
           }
         } else {
-          debugLog(`frame freeze rung 3: native source reload, ${videoFacts(video)}`)
+          debugLog(
+            `frame freeze rung 3: native source reload, ${videoFacts(video)}`
+          )
           reloadNativeSource()
         }
       }
@@ -1646,7 +1667,9 @@ export function TVPlayer({
       )
 
       if (runs.length >= PLAYER_FRAME_FREEZE_MAX_RUNS) {
-        debugLog("frame freeze ladder exhausted — switching to silent reconnect")
+        debugLog(
+          "frame freeze ladder exhausted — switching to silent reconnect"
+        )
         handOffToSilentReconnect()
         return
       }
@@ -1751,7 +1774,9 @@ export function TVPlayer({
       // Mode 1: the tap gesture is parked and the buffer is filling.
       if (prebufferRef.current.active) {
         if (sampleTick % 4 === 0) {
-          debugLog(`sampler[prepare] paused=${video.paused} ${videoFacts(video)}`)
+          debugLog(
+            `sampler[prepare] paused=${video.paused} ${videoFacts(video)}`
+          )
         }
 
         samplePrebuffer(now)
@@ -1761,7 +1786,9 @@ export function TVPlayer({
       // Mode 2: deliberate refill hold in progress after a freeze.
       if (rebufferActive) {
         if (sampleTick % 4 === 0) {
-          debugLog(`sampler[rebuffer] paused=${video.paused} ${videoFacts(video)}`)
+          debugLog(
+            `sampler[rebuffer] paused=${video.paused} ${videoFacts(video)}`
+          )
         }
 
         sampleRebuffer(now)
@@ -1883,7 +1910,8 @@ export function TVPlayer({
         timeAdvanced &&
         video.readyState >= 3 &&
         !spinnerOn &&
-        (reconnectCountRef.current > 0 || frameFreezeRunsRef.current.length > 0) &&
+        (reconnectCountRef.current > 0 ||
+          frameFreezeRunsRef.current.length > 0) &&
         (frameCount === null || now - frameProgressAt < PLAYER_FRAME_FREEZE_MS)
       ) {
         scheduleReconnectReset()
@@ -1907,14 +1935,16 @@ export function TVPlayer({
         } else if (frameAge >= PLAYER_FRAME_FREEZE_MS && document.hidden) {
           frameProgressAt = now
           noteFrameWatchdog("waiting: tab hidden")
-        } else if (frameAge >= PLAYER_FRAME_FREEZE_MS && video.videoWidth === 0) {
+        } else if (
+          frameAge >= PLAYER_FRAME_FREEZE_MS &&
+          video.videoWidth === 0
+        ) {
           frameProgressAt = now
           noteFrameWatchdog("waiting: audio-only")
         } else if (frameCount === null) {
           noteFrameWatchdog("unavailable: no frame counter")
         } else if (frameAge >= PLAYER_FRAME_FREEZE_MS) {
-          const inPictureInPicture =
-            document.pictureInPictureElement === video
+          const inPictureInPicture = document.pictureInPictureElement === video
 
           if (inPictureInPicture && (lastFrameCount ?? 0) === 0) {
             frameProgressAt = now
@@ -1978,7 +2008,9 @@ export function TVPlayer({
 
         if (!cancelled && usingHls && hls) {
           writeBandwidthEstimate(hls.bandwidthEstimate)
-          debugLog(`bandwidth estimate saved: ${Math.round(hls.bandwidthEstimate)}bps`)
+          debugLog(
+            `bandwidth estimate saved: ${Math.round(hls.bandwidthEstimate)}bps`
+          )
         }
       }, PLAYER_ESTIMATE_SAVE_DELAY_MS)
 
@@ -2239,7 +2271,8 @@ export function TVPlayer({
 
       hls.on(Hls.Events.ERROR, (_event, data) => {
         const status = errorHttpStatus(data)
-        const failingUrl = data.url ?? data.response?.url ?? data.frag?.url ?? src
+        const failingUrl =
+          data.url ?? data.response?.url ?? data.frag?.url ?? src
         const host = urlHost(failingUrl)
 
         // Logged before the guards: during a silent reconnect the old
@@ -2334,17 +2367,22 @@ export function TVPlayer({
     ) {
       const video = videoRef.current
       if (video) {
-        void video.play().then(() => {
-          if (cancelled) return
-          hasStartedRef.current = true
-          setHasStarted(true)
-          setStreamActive(true)
-          setIsLoading(true)
-        }).catch((err) => {
-          if (!isAbortError(err)) {
-            debugLog(`autoplay blocked, play button will show: ${String(err)}`)
-          }
-        })
+        void video
+          .play()
+          .then(() => {
+            if (cancelled) return
+            hasStartedRef.current = true
+            setHasStarted(true)
+            setStreamActive(true)
+            setIsLoading(true)
+          })
+          .catch((err) => {
+            if (!isAbortError(err)) {
+              debugLog(
+                `autoplay blocked, play button will show: ${String(err)}`
+              )
+            }
+          })
       }
     }
 
@@ -2357,7 +2395,8 @@ export function TVPlayer({
           if (cancelled) return
 
           rvfcFrameCount += 1
-          rvfcHandle = callbackVideo.requestVideoFrameCallback?.(onFrame) ?? null
+          rvfcHandle =
+            callbackVideo.requestVideoFrameCallback?.(onFrame) ?? null
         }
 
         rvfcHandle = callbackVideo.requestVideoFrameCallback(onFrame)
@@ -2369,7 +2408,8 @@ export function TVPlayer({
       const duration =
         Number.isFinite(durationMs) && durationMs > 0 ? durationMs : 0
 
-      simulatedFrameFreezeUntilRef.current = duration > 0 ? Date.now() + duration : 0
+      simulatedFrameFreezeUntilRef.current =
+        duration > 0 ? Date.now() + duration : 0
       simulatedFrameCount = null
       debugLog(
         `simulate video freeze for ${duration}ms (0 clears); ${videoFacts(video)}`
@@ -2514,10 +2554,7 @@ export function TVPlayer({
     document.addEventListener("visibilitychange", handleVisibilityChange)
 
     return () =>
-      document.removeEventListener(
-        "visibilitychange",
-        handleVisibilityChange
-      )
+      document.removeEventListener("visibilitychange", handleVisibilityChange)
   }, [])
 
   const handleResume = useCallback(() => {
@@ -2668,27 +2705,18 @@ export function TVPlayer({
         />
 
         {!hasStarted && !error && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-muted/40 to-background/80">
-            <button
-              type="button"
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black dark:bg-slate-900">
+            <div
               onClick={startPlayback}
-              aria-label={`Play ${channelName}`}
-              className="group flex h-20 w-20 items-center justify-center rounded-full border border-border/50 bg-red-600 text-white shadow-xl shadow-red-600/20 transition duration-200 hover:scale-110 hover:bg-red-500 focus:ring-4 focus:ring-red-400/50 focus:outline-none sm:h-24 sm:w-24"
+              className="flex h-16 w-16 items-center justify-center rounded-full border border-border/80 text-muted-foreground shadow-lg transition-transform duration-200 hover:scale-105 sm:h-20 sm:w-20"
             >
-              <svg
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="ml-1 h-9 w-9 sm:h-11 sm:w-11"
-                aria-hidden="true"
-              >
-                <path d="M8 5.5v13l11-6.5z" />
-              </svg>
-            </button>
+              <Play className="ml-1 h-7 w-7 fill-current sm:h-8 sm:w-8" />
+            </div>
 
-            <p className="mt-5 text-sm font-semibold text-foreground">
+            <p className="mt-5 text-sm font-semibold text-white/80 dark:text-accent-foreground">
               Watch {channelName}
             </p>
-            <p className="mt-1 text-xs text-muted-foreground">
+            <p className="mt-1 text-xs text-white/80 dark:text-accent-foreground">
               Click to start streaming
             </p>
           </div>
@@ -2712,13 +2740,14 @@ export function TVPlayer({
             </p>
 
             {prepare.playNow && !isBuffering && (
-              <button
+              <Button
                 type="button"
                 onClick={handlePlayNow}
-                className="mt-4 flex min-h-[44px] items-center rounded-xl bg-red-600 px-5 text-sm font-bold text-white transition hover:bg-red-500"
+                variant="destructive"
+                className="mt-4 flex min-h-11 items-center rounded-xl bg-red-600 px-5 text-sm font-bold text-white transition hover:bg-red-500"
               >
                 Play now
-              </button>
+              </Button>
             )}
           </div>
         )}
@@ -2768,22 +2797,25 @@ export function TVPlayer({
             <p className="mt-3 text-sm font-medium text-foreground">
               Stream paused
             </p>
-            <button
+            <Button
               type="button"
               onClick={handleResume}
+              variant="destructive"
               className="mt-3 flex min-h-[44px] items-center rounded-xl bg-red-600 px-5 text-sm font-bold text-white transition hover:bg-red-500"
             >
               Resume
-            </button>
+            </Button>
           </div>
         )}
 
         {needsTapToPlay && !error && (
           <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-background/80 p-6 text-center">
-            <button
+            <Button
               type="button"
               onClick={handleTapToPlay}
               aria-label={`Play ${channelName}`}
+              variant="destructive"
+              size="icon-lg"
               className="group flex h-20 w-20 items-center justify-center rounded-full border border-border/50 bg-red-600 text-white shadow-xl shadow-red-600/20 transition duration-200 hover:scale-110 hover:bg-red-500 focus:ring-4 focus:ring-red-400/50 focus:outline-none sm:h-24 sm:w-24"
             >
               <svg
@@ -2794,7 +2826,7 @@ export function TVPlayer({
               >
                 <path d="M8 5.5v13l11-6.5z" />
               </svg>
-            </button>
+            </Button>
 
             <p className="mt-5 text-sm font-semibold text-foreground">
               Tap to play
@@ -2807,22 +2839,24 @@ export function TVPlayer({
             <p className="max-w-md text-sm text-red-300">{error}</p>
 
             <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-              <button
+              <Button
                 type="button"
                 onClick={handleRetry}
+                variant="destructive"
                 className="flex min-h-[44px] items-center rounded-lg bg-red-600 px-5 text-sm font-semibold text-white transition hover:bg-red-500"
               >
                 Try Again
-              </button>
+              </Button>
 
               {onTryAnotherChannel && (
-                <button
+                <Button
                   type="button"
                   onClick={onTryAnotherChannel}
+                  variant="secondary"
                   className="flex min-h-[44px] items-center rounded-lg bg-muted/50 px-5 text-sm font-semibold text-foreground transition hover:bg-muted/30"
                 >
                   Try another channel
-                </button>
+                </Button>
               )}
             </div>
           </div>
@@ -2852,37 +2886,43 @@ export function TVPlayer({
 
           <div className="ml-auto flex items-center gap-2">
             {banner === "struggling" && (
-              <button
+              <Button
                 type="button"
                 onClick={applyDataSaver}
+                variant="destructive"
+                size="xs"
                 className="flex min-h-[32px] items-center rounded-lg bg-amber-500 px-3 text-xs font-bold text-black transition hover:bg-amber-400"
               >
                 Data saver
-              </button>
+              </Button>
             )}
 
             {banner === "tooSlow" && (
-              <button
+              <Button
                 type="button"
                 onClick={tryAnotherChannel}
+                variant="destructive"
+                size="xs"
                 className="flex min-h-[32px] items-center rounded-lg bg-red-600 px-3 text-xs font-bold text-white transition hover:bg-red-500"
               >
                 Try another channel
-              </button>
+              </Button>
             )}
 
-            <button
+            <Button
               type="button"
               onClick={() => setBanner(null)}
+              variant="ghost"
+              size="xs"
               className="flex min-h-[32px] items-center px-2 text-xs text-zinc-400 transition hover:text-white"
             >
               Dismiss
-            </button>
+            </Button>
           </div>
         </div>
       )}
 
-      <div className="flex items-center gap-2 px-4 py-3 border-t border-border/80">
+      <div className="flex items-center gap-2 border-t border-border/80 px-4 py-3">
         <span
           className={cn(
             "h-2 w-2 rounded-full",
@@ -2915,20 +2955,24 @@ export function TVPlayer({
         )}
 
         {canPictureInPicture && (
-          <button
+          <Button
             type="button"
             onClick={togglePictureInPicture}
             aria-label="Picture in picture"
+            variant="ghost"
+            size="icon-sm"
             className="flex h-11 w-11 items-center justify-center rounded-lg text-muted-foreground transition hover:bg-muted/50 hover:text-foreground"
           >
             <PictureInPicture className="h-5 w-5" aria-hidden="true" />
-          </button>
+          </Button>
         )}
 
-        <button
+        <Button
           type="button"
           onClick={toggleFullscreen}
           aria-label={isFullscreen ? "Exit fullscreen" : "Fullscreen"}
+          variant="ghost"
+          size="icon-sm"
           className="flex h-11 w-11 items-center justify-center rounded-lg text-zinc-300 transition hover:bg-white/10 hover:text-white"
         >
           {isFullscreen ? (
@@ -2936,7 +2980,7 @@ export function TVPlayer({
           ) : (
             <Maximize className="h-5 w-5" aria-hidden="true" />
           )}
-        </button>
+        </Button>
       </div>
     </div>
   )

@@ -10,6 +10,7 @@ import { ServerSelector } from "@/components/home/server-selector"
 import { useChannels } from "@/hooks/use-channels"
 import { useLazyStreamTester } from "@/hooks/use-lazy-stream-tester"
 import { readSessionPrefs, writeSessionPrefs } from "@/lib/prefs"
+import { Button } from "@/components/ui/button"
 import type { Channel, ServerOption } from "@/lib/types"
 
 type DashboardProps = {
@@ -251,14 +252,16 @@ export function Dashboard({ server, servers, onSelectServer }: DashboardProps) {
               aria-label="Search channels"
             />
             {search && (
-              <button
+              <Button
                 type="button"
                 onClick={() => setSearch("")}
                 aria-label="Clear search"
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition"
+                variant="ghost"
+                size="icon-sm"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition p-1"
               >
                 <X className="w-3.5 h-3.5" />
-              </button>
+              </Button>
             )}
           </div>
         </div>
