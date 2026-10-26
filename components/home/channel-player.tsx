@@ -54,6 +54,8 @@ type ChannelPlayerProps = {
   /** Escape hatch from the player's "connection too slow" banner. */
   onTryAnotherChannel?: () => void
   onRetry?: () => void
+  /** Stops playback and returns to the empty "select a channel" state. */
+  onStop?: () => void
 }
 
 export function ChannelPlayer({
@@ -65,6 +67,7 @@ export function ChannelPlayer({
   onPlaybackActiveChange,
   onTryAnotherChannel,
   onRetry,
+  onStop,
 }: ChannelPlayerProps) {
   if (!channel) {
     return (
@@ -80,6 +83,10 @@ export function ChannelPlayer({
           </p>
           <p className="mt-1 text-xs text-white/80 dark:text-accent-foreground">
             Choose a stream from the live channels library
+          </p>
+          <p className="mt-2 text-[10px] text-muted-foreground/70">
+            Streams are tested in your browser before you play — green means
+            it&apos;s working.
           </p>
         </div>
 
@@ -128,6 +135,7 @@ export function ChannelPlayer({
         onPlaybackFailed={onPlaybackFailed}
         onPlaybackActiveChange={onPlaybackActiveChange}
         onTryAnotherChannel={onTryAnotherChannel}
+        onStop={onStop}
       />
     </div>
   )

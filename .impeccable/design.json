@@ -1,0 +1,190 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-26T00:00:00.000Z",
+  "title": "Design System: LiveTVFree",
+  "extensions": {
+    "colorMeta": {
+      "broadcast-red": {
+        "role": "primary",
+        "displayName": "Broadcast Red",
+        "canonical": "oklch(63.7% 0.237 22.2)",
+        "tonalRamp": [
+          "oklch(24% 0.14 20)",
+          "oklch(34% 0.17 21)",
+          "oklch(44% 0.20 22)",
+          "oklch(54% 0.23 23)",
+          "oklch(63.7% 0.237 22.2)",
+          "oklch(75% 0.19 21)",
+          "oklch(85% 0.12 20)",
+          "oklch(93% 0.05 18)"
+        ]
+      },
+      "slate-mist": {
+        "role": "neutral",
+        "displayName": "Slate Mist",
+        "canonical": "oklch(95.1% 0.002 228.6)",
+        "tonalRamp": [
+          "oklch(45% 0.008 230)",
+          "oklch(58% 0.006 230)",
+          "oklch(72% 0.004 230)",
+          "oklch(84% 0.003 230)",
+          "oklch(95.1% 0.002 228.6)",
+          "oklch(97% 0.001 228)",
+          "oklch(98.5% 0.001 228)",
+          "oklch(99.5% 0 228)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "oklch(11.4% 0.004 235)",
+        "tonalRamp": [
+          "oklch(8% 0.003 235)",
+          "oklch(11.4% 0.004 235)",
+          "oklch(18% 0.005 235)",
+          "oklch(28% 0.006 232)",
+          "oklch(38% 0.006 230)",
+          "oklch(50% 0.006 228)",
+          "oklch(65% 0.005 226)",
+          "oklch(82% 0.004 224)"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "#f8fafc",
+          "#f1f5f9",
+          "#e2e8f0",
+          "#cbd5e1",
+          "#94a3b8",
+          "#64748b",
+          "#475569",
+          "#334155"
+        ]
+      },
+      "slate-line": {
+        "role": "neutral",
+        "displayName": "Slate Line",
+        "canonical": "#e2e8f0",
+        "tonalRamp": [
+          "#1e293b",
+          "#334155",
+          "#475569",
+          "#64748b",
+          "#94a3b8",
+          "#cbd5e1",
+            "#e2e8f0",
+          "#f1f5f9"
+        ]
+      },
+      "muted-ink": {
+        "role": "neutral",
+        "displayName": "Muted Ink",
+        "canonical": "oklch(59% 0.01 240)",
+        "tonalRamp": [
+          "oklch(30% 0.008 240)",
+          "oklch(42% 0.009 240)",
+          "oklch(52% 0.01 240)",
+          "oklch(59% 0.01 240)",
+          "oklch(68% 0.009 238)",
+          "oklch(78% 0.007 236)",
+          "oklch(88% 0.005 234)",
+          "oklch(94% 0.003 232)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "body": { "displayName": "Body", "purpose": "Interface text, channel names, descriptive copy." },
+      "label": { "displayName": "Label", "purpose": "Captions, channel groups, status labels, small data." },
+      "mono": { "displayName": "Mono", "purpose": "Code-ish data such as playlist sources and technical labels." }
+    },
+    "shadows": [
+      { "name": "state-lift", "value": "0 4px 20px -2px rgba(0,0,0,0.05)", "purpose": "Glass panels and hovered surfaces — temporary elevation on interaction." },
+      { "name": "selection-lift", "value": "0 0 0 1px rgba(0,0,0,0.05), 0 4px 6px -1px rgba(0,0,0,0.1)", "purpose": "Selected channel list item — color-tinted depth confirming the active choice." },
+      { "name": "button-soft", "value": "0 1px 2px 0 rgb(0 0 0 / 0.05)", "purpose": "Subtle button lift at rest in light mode." }
+    ],
+    "motion": [
+      { "name": "ease-standard", "value": "cubic-bezier(0.4, 0, 0.2, 1)", "purpose": "Default easing for state transitions." },
+      { "name": "pulse-slow", "value": "3s", "purpose": "Status-dot testing pulse duration." },
+      { "name": "reduced-motion", "value": "0.01ms", "purpose": "All animation/transition duration under prefers-reduced-motion." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "lg", "value": "1024px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Main call-to-action. Broadcast Red fill, white text, hover darkens to 80% opacity, focus shows a 3px red ring at 50% opacity.",
+      "html": "<button class=\"ds-btn-primary\">Go live</button>",
+      "css": ".ds-btn-primary { display: inline-flex; shrink: 0; items-center: true; justify-center: true; border-radius: 10px; border: none; background: #ef4444; color: #ffffff; font-size: 0.875rem; font-weight: 500; white-space: nowrap; height: 2rem; padding: 0 10px; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); outline: none; cursor: pointer; } .ds-btn-primary:hover { background: rgba(239, 68, 68, 0.8); } .ds-btn-primary:focus-visible { box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.5); } .ds-btn-primary:active { transform: translateY(1px); } .ds-btn-primary:disabled { opacity: 0.5; pointer-events: none; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Quiet secondary action. Transparent fill, ink text, muted hover background, focus ring.",
+      "html": "<button class=\"ds-btn-ghost\">Theme</button>",
+      "css": ".ds-btn-ghost { display: inline-flex; shrink: 0; items-center: true; justify-center: true; border-radius: 10px; border: none; background: transparent; color: #090b0e; font-size: 0.875rem; font-weight: 500; white-space: nowrap; height: 2rem; padding: 0 10px; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); outline: none; cursor: pointer; } .ds-btn-ghost:hover { background: #f1f5f9; color: #090b0e; } .ds-btn-ghost:focus-visible { box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.5); } .ds-btn-ghost:disabled { opacity: 0.5; pointer-events: none; }"
+    },
+    {
+      "name": "Channel List Item",
+      "kind": "custom",
+      "refersTo": "channel-list-item",
+      "description": "Signature row: scannable channel entry with avatar, name, group, and status dot. Dense (10px padding), 10px radius, flat at rest, lifts with red-tinted shadow when selected.",
+      "html": "<div class=\"ds-channel-item\" aria-pressed=\"false\" role=\"button\" tabindex=\"0\"><div class=\"ds-avatar\">AB</div><div class=\"ds-meta\"><div class=\"ds-name\">BBC One</div><div class=\"ds-group\">General</div></div><span class=\"ds-status-dot ds-status-working\" title=\"Working\"></span></div>",
+      "css": ".ds-channel-item { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #e2e8f0; background: rgba(255,255,255,0.8); color: #090b0e; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); outline: none; } .ds-channel-item:hover { background: #ffffff; border-color: #cbd5e1; } .ds-channel-item[aria-pressed=\"true\"], .ds-channel-item.selected { background: rgba(239, 68, 68, 0.1); border-color: #ef4444; box-shadow: 0 0 0 1px rgba(0,0,0,0.05), 0 4px 6px -1px rgba(0,0,0,0.1); } .ds-avatar { width: 8px; height: 8px; min-width: 32px; min-height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; background: #f1f5f9; color: #64748b; flex-shrink: 0; overflow: hidden; } .ds-avatar.selected { background: #ef4444; color: #ffffff; } .ds-meta { min-width: 0; display: flex; flex-direction: column; } .ds-name { font-size: 0.875rem; font-weight: 700; color: #090b0e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .ds-group { font-size: 9px; color: #64748b; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .ds-status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-left: 8px; } .ds-status-working { background: #10b981; } .ds-status-failed { background: #f43f5e; } .ds-status-testing { background: #fbbf24; animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite; } .ds-status-untested { background: rgba(100, 116, 139, 0.3); }"
+    },
+    {
+      "name": "Status Dot",
+      "kind": "custom",
+      "refersTo": "status-dot",
+      "description": "8px circular status indicator: working emerald, failed rose, testing pulsing amber, untested muted.",
+      "html": "<span class=\"ds-status-dot ds-status-working\" title=\"Working\"></span>",
+      "css": ".ds-status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; } .ds-status-working { background: #10b981; } .ds-status-failed { background: #f43f5e; } .ds-status-testing { background: #fbbf24; animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite; } .ds-status-untested { background: rgba(100, 116, 139, 0.3); }"
+    },
+    {
+      "name": "Site Header",
+      "kind": "nav",
+      "refersTo": "site-header",
+      "description": "Sticky top bar: logo left, source link and theme toggle right. Blurred background, subtle bottom border, responsive padding.",
+      "html": "<header class=\"ds-header\"><div class=\"ds-header-inner\"><div class=\"ds-logo\">LiveTVFree</div><div class=\"ds-actions\"><button class=\"ds-icon-btn\">?</button></div></div></header>",
+      "css": ".ds-header { position: sticky; top: 0; z-index: 20; height: 56px; background: rgba(241, 245, 249, 0.95); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(226, 232, 240, 0.8); } .ds-header-inner { max-width: 1280px; margin: 0 auto; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 100%; } .ds-header-inner @media (min-width: 640px) { padding: 0 24px; } .ds-header-inner @media (min-width: 1024px) { padding: 0 32px; } .ds-icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 14px; border: none; background: #ffffff; color: #64748b; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); } .ds-icon-btn:hover { color: #090b0e; border-color: #94a3b8; }"
+    },
+    {
+      "name": "Glass Panel",
+      "kind": "card",
+      "refersTo": "glass-panel",
+      "description": "Backdrop-blur overlay panel with semi-transparent background and hairline border; sits over content without obscuring it.",
+      "html": "<div class=\"ds-glass-panel\">Content</div>",
+      "css": ".ds-glass-panel { background: rgba(255,255,255,0.9); backdrop-filter: blur(12px); border: 1px solid rgba(0,0,0,0.08); box-shadow: 0 4px 20px -2px rgba(0,0,0,0.05); border-radius: 10px; padding: 16px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Control Room",
+    "overview": "LiveTVFree is a dispatch-style dashboard for live TV: quick status scanning, signal clarity, and an instrument-panel feel. The visitor opens the app to find a channel worth watching across sports, news, and entertainment, and their job is to locate a stream that actually plays without wasting time on dead links. The visual system treats every screen like a control surface — dense enough to scan many channels at once, but with enough breathing room that a single \"working\" signal jumps out. Personality is deliberate and utilitarian with a confident accent: near-black text on a misty slate field, crisp borders, and Broadcast Red reserved for interactivity and status. Dark mode inverts to a deep charcoal field with paper surfaces, keeping the same red accent so the instrument panel reads identically in both themes. Motion is minimal and purposeful (status-dot pulses, soft hover lifts), never decorative.",
+    "keyCharacteristics": [ "Dispatch dashboard density: many channels scannable at once, one playable signal easy to spot.", "Broadcast Red as the single accent for buttons, focus rings, selection, and status.", "Flat-by-default surfaces; shadows and lifts appear only as a response to state (hover, selection, focus).", "Dark mode as a first-class theme, not an afterthought; red accent holds constant across both.", "Responsive shell: sticky rail on phones, rail-plus-sidebar on desktop." ],
+    "rules": [
+      { "name": "The One Voice Rule", "body": "Broadcast Red is the sole saturated accent on any given screen. Its rarity is the point: if everything shouts, no signal lands.", "section": "colors" },
+      { "name": "The Small-Text Rule", "body": "Captions and group labels sit at 0.8rem / text-xs with 500 weight — small but never light. If it's hard to read at a glance, it's too small or too thin.", "section": "typography" },
+      { "name": "The Flat-By-Default Rule", "body": "Surfaces are flat at rest. Shadows appear only as a response to state (hover, elevation, focus, selection). Never use shadow to separate content that color and border can separate.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do use Broadcast Red (#ef4444) as the only saturated accent; keep it rare so the signal lands (One Voice Rule).",
+      "Do keep surfaces flat at rest; add shadow/lift only on hover, selection, or focus (Flat-By-Default Rule).",
+      "Do render status dots at exactly 8px with the working/failed/testing/untested color mapping; never reuse those colors for non-status elements.",
+      "Do keep channel rows at 10px padding with truncating two-line text so many channels stay scannable."
+    ],
+    "donts": [
+      "Don't introduce a second saturated hue (blue, green, purple) as a brand accent; emerald/rose/amber exist only for status dots.",
+      "Don't set a centralized heading scale in globals.css and then ignore it — if you add one, apply it consistently across Display / Headline / Title.",
+      "Don't drop shadows beneath unselected cards to fake depth; use border and background layering instead.",
+      "Don't make channel rows taller than the 10px-padded baseline unless a new information tier is justified."
+    ]
+  }
+}

@@ -2,6 +2,7 @@
 
 import { Search, X } from "lucide-react"
 import { useCallback } from "react"
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 
 type ChannelSearchProps = {
@@ -40,7 +41,10 @@ export function ChannelSearch({
           placeholder={placeholder}
           autoComplete="off"
           enterKeyHint="search"
-          className={className}
+          className={cn(
+            className,
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/50 focus-visible:ring-offset-1 focus-visible:border-red-500/60"
+          )}
           aria-label="Search channels"
         />
         {value && (

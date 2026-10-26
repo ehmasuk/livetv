@@ -51,7 +51,7 @@ import {
 } from "@/lib/prefs"
 import { cn } from "@/lib/utils"
 import Hls, { type ErrorData, type Level } from "hls.js"
-import { Maximize, Minimize, PictureInPicture, Play } from "lucide-react"
+import { Maximize, Minimize, PictureInPicture, Play, X } from "lucide-react"
 import { useCallback, useEffect, useRef, useState } from "react"
 
 type TVPlayerProps = {
@@ -65,6 +65,8 @@ type TVPlayerProps = {
   onPlaybackActiveChange?: (active: boolean) => void
   /** Escape hatch from the "connection too slow" banner. */
   onTryAnotherChannel?: () => void
+  /** Stops playback and returns to the empty "select a channel" state. */
+  onStop?: () => void
 }
 
 /**
@@ -341,6 +343,7 @@ export function TVPlayer({
   onPlaybackFailed,
   onPlaybackActiveChange,
   onTryAnotherChannel,
+  onStop,
 }: TVPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -2932,6 +2935,19 @@ export function TVPlayer({
         <span className="truncate text-sm font-medium text-foreground">
           {channelName}
         </span>
+
+        {onStop && (
+          <Button
+            type="button"
+            onClick={onStop}
+            aria-label="Stop stream"
+            variant="ghost"
+            size="icon-sm"
+            className="flex h-11 w-11 items-center justify-center rounded-lg text-muted-foreground transition hover:bg-red-500/10 hover:text-red-500"
+          >
+            <X className="h-5 w-5" aria-hidden="true" />
+          </Button>
+        )}
 
         <span className="ml-auto text-xs text-muted-foreground">
           {isPlaying ? "LIVE" : isLoading ? "LOADING" : "READY"}

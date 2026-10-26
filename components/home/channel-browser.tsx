@@ -183,18 +183,6 @@ export function ChannelBrowser({
 
   return (
     <div>
-      {/* Mobile-only search, directly above the channel list so it stays close
-          to the channels instead of sitting above the player. */}
-      {onSearchChange && (
-        <ChannelSearch
-          value={search}
-          onChange={onSearchChange}
-          type="search"
-          className="w-full pl-9 pr-8 py-2.5 dark:bg-background bg-white border border-border focus:border-red-500 rounded-lg text-sm text-foreground placeholder:text-muted-foreground outline-none transition"
-          containerClassName="mb-2 md:hidden"
-        />
-      )}
-
       {/* Channel Cards List Container */}
       <div
         className="glass-panel max-h-125 min-h-95 space-y-1.5 overflow-y-auto rounded-xl border border-border p-2 lg:max-h-[calc(100vh-230px)]"

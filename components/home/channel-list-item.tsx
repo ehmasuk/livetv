@@ -27,8 +27,8 @@ const STATUS_DOT_CLASSES: Record<ChannelStatus | "untested", string> = {
 
 function getChannelMonogram(name: string): string {
   const parts = name.trim().split(/\s+/)
-  if (parts.length >= 2 && parts[0][0] && parts[1][0]) {
-    return (parts[0][0] + parts[1][0]).toUpperCase()
+  if (parts.length >= 2 && parts[0][0] && parts[parts.length - 1][0]) {
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
   }
   return name.slice(0, 2).toUpperCase()
 }
@@ -46,13 +46,22 @@ export const ChannelListItem = memo(function ChannelListItem({
   return (
     <div
       onClick={() => onSelect(channel)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault()
+          onSelect(channel)
+        }
+      }}
+      role="button"
+      tabIndex={0}
       aria-pressed={selected}
       aria-label={`${channel.name}, ${channel.group}, ${statusLabel}`}
       className={cn(
-        "cv-row p-2.5 rounded-lg border transition-all cursor-pointer flex items-center justify-between group w-full text-left",
+        "cv-row p-2.5 rounded-lg border transition-all cursor-pointer flex items-center justify-between group w-full text-left outline-none",
         selected
           ? "bg-red-500/10 border-red-500 shadow-md shadow-red-500/10"
-          : "bg-card/80 border-border hover:bg-card hover:border-slate-400 dark:hover:border-slate-700"
+          : "bg-card/80 border-border hover:bg-card hover:border-slate-400 dark:hover:border-slate-700",
+        "focus-visible:ring-2 focus-visible:ring-red-500/50 focus-visible:ring-offset-1 focus-visible:border-red-500/60"
       )}
     >
       <div className="flex items-center gap-2.5 min-w-0">
@@ -91,9 +100,11 @@ export const ChannelListItem = memo(function ChannelListItem({
           <div className="text-xs font-bold text-foreground group-hover:text-red-500 dark:group-hover:text-white transition-colors truncate">
             {channel.name}
           </div>
-          <div className="text-[9px] text-muted-foreground truncate mt-0.5">
-            {channel.group || "General"}
-          </div>
+          {channel.group && channel.group !== "Uncategorized" && (
+            <div className="text-[9px] text-muted-foreground truncate mt-0.5">
+              {channel.group}
+            </div>
+          )}
         </div>
       </div>
 

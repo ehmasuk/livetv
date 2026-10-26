@@ -150,6 +150,12 @@ export function Dashboard({ server, servers, onSelectServer }: DashboardProps) {
     setNotice(null)
   }, [])
 
+  /** Clears the selected channel so the player returns to the empty state. */
+  const handleStop = useCallback(() => {
+    resetNotice()
+    setSelectedChannel(null)
+  }, [resetNotice])
+
   const handleRetestAll = useCallback(() => {
     tester.retestAll()
   }, [tester])
@@ -212,21 +218,10 @@ export function Dashboard({ server, servers, onSelectServer }: DashboardProps) {
         </div>
       )}
 
-      {/* 1. TOP BAR: CHANNEL HEALTH CHECKER (COMPACT & MODERN) */}
-      {/* Hidden on small devices; shows from medium screens and up */}
-      <div className="hidden md:block">
-        <ChannelHealth
-          counts={tester.counts}
-          isTesting={tester.isTesting}
-          disabled={loading || tester.counts.total === 0}
-          onRetestAll={handleRetestAll}
-        />
-      </div>
-
-      {/* 2. SECOND ROW: SELECT SERVER & SEARCH CHANNELS (SAME LINE) */}
+      {/* 1. TOP BAR: SOURCE SELECTOR + SEARCH (consistent on desktop & mobile) */}
       <section className="glass-panel rounded-xl p-2.5 border border-border">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
-          {/* Select Server Chips */}
+          {/* Source Selector Chips */}
           <div className="md:col-span-8">
             <ServerSelector
               servers={servers}
@@ -235,9 +230,8 @@ export function Dashboard({ server, servers, onSelectServer }: DashboardProps) {
             />
           </div>
 
-          {/* Channel Search Input — desktop only; mobile search lives above
-              the channel list in ChannelBrowser. */}
-          <div className="hidden md:block md:col-span-4">
+          {/* Channel Search Input — same location on desktop and mobile. */}
+          <div className="md:col-span-4">
             <ChannelSearch
               value={search}
               onChange={setSearch}
@@ -248,7 +242,7 @@ export function Dashboard({ server, servers, onSelectServer }: DashboardProps) {
         </div>
       </section>
 
-      {/* 3. MAIN CONTENT: VIDEO PLAYER (LEFT) + CHANNELS SIDEBAR (RIGHT) */}
+      {/* 2. MAIN CONTENT: VIDEO PLAYER (LEFT) + CHANNELS SIDEBAR (RIGHT) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         {/* VIDEO PLAYER (70% Width / 8 Cols) */}
         <div className="lg:col-span-9 flex flex-col space-y-2">
@@ -261,6 +255,7 @@ export function Dashboard({ server, servers, onSelectServer }: DashboardProps) {
             onPlaybackActiveChange={handlePlaybackActiveChange}
             onTryAnotherChannel={handleTryAnotherChannel}
             onRetry={handleRetry}
+            onStop={handleStop}
           />
         </div>
 
@@ -286,6 +281,16 @@ export function Dashboard({ server, servers, onSelectServer }: DashboardProps) {
             onSelect={handleSelect}
           />
         </div>
+      </div>
+
+      {/* 3. CHANNEL HEALTH CHECKER (demoted — secondary, desktop only) */}
+      <div className="hidden lg:block">
+        <ChannelHealth
+          counts={tester.counts}
+          isTesting={tester.isTesting}
+          disabled={loading || tester.counts.total === 0}
+          onRetestAll={handleRetestAll}
+        />
       </div>
     </div>
   )
