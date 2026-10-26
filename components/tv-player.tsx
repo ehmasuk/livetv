@@ -2318,6 +2318,36 @@ export function TVPlayer({
       debugLog("engine: none — stream format unsupported")
     }
 
+    /**
+     * First visit: attempt autoplay so clicking a channel plays the stream
+     * without an extra tap. Browsers that block play() without a fresh
+     * gesture on the video element will reject — in that case we do nothing
+     * and the play button stays visible for the user to tap. We only mark
+     * the stream as started once play() actually resolves, so the button is
+     * never hidden unless playback is genuinely underway.
+     */
+    if (
+      reloadToken === 0 &&
+      !hasStartedRef.current &&
+      !startingRef.current &&
+      !unsupportedRef.current
+    ) {
+      const video = videoRef.current
+      if (video) {
+        void video.play().then(() => {
+          if (cancelled) return
+          hasStartedRef.current = true
+          setHasStarted(true)
+          setStreamActive(true)
+          setIsLoading(true)
+        }).catch((err) => {
+          if (!isAbortError(err)) {
+            debugLog(`autoplay blocked, play button will show: ${String(err)}`)
+          }
+        })
+      }
+    }
+
     // Frame-count fallback for browsers without getVideoPlaybackQuality().
     if (videoFrameCount(video) === null) {
       const callbackVideo = video as FrameCallbackVideo
@@ -2630,6 +2660,7 @@ export function TVPlayer({
           key={`player-${reloadToken}`}
           ref={videoRef}
           controls={hasStarted && !error}
+          muted
           playsInline
           preload="none"
           className="h-full w-full bg-black object-contain"

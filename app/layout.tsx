@@ -5,6 +5,7 @@ import type { ReactNode } from "react"
 import "./globals.css"
 import { PwaRegistrar } from "@/components/pwa-register"
 import { ThemeProvider } from "@/components/theme-provider"
+import { TooltipProvider } from "@/components/ui/tooltip"
 import { APP_DESCRIPTION, APP_NAME } from "@/lib/constants"
 import { cn } from "@/lib/utils"
 
@@ -65,7 +66,9 @@ export default function RootLayout({
       className={cn("antialiased", inter.variable, geistMono.variable)}
     >
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <TooltipProvider>{children}</TooltipProvider>
+        </ThemeProvider>
         <PwaRegistrar />
       </body>
     </html>
