@@ -207,45 +207,24 @@ export function Dashboard({ server, servers, onSelectServer }: DashboardProps) {
   }, [notice])
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {tester.isOffline && (
         <div
           role="status"
-          className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2 text-xs text-amber-600 dark:text-amber-200"
+          className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-600 dark:text-amber-200 shadow-sm"
         >
           You are offline — channel testing is paused and streams may not
           load. Checking your connection...
         </div>
       )}
 
-      {/* 1. TOP BAR: SOURCE SELECTOR + SEARCH (consistent on desktop & mobile) */}
-      <section className="glass-panel rounded-xl p-2.5 border border-border">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
-          {/* Source Selector Chips */}
-          <div className="md:col-span-8">
-            <ServerSelector
-              servers={servers}
-              selectedServerId={server.id}
-              onSelect={onSelectServer}
-            />
-          </div>
-
-          {/* Channel Search Input — same location on desktop and mobile. */}
-          <div className="md:col-span-4">
-            <ChannelSearch
-              value={search}
-              onChange={setSearch}
-              id="channelSearchInput"
-              className="w-full pl-9 pr-8 py-3 bg-background border border-border focus:border-red-500 rounded-lg text-sm text-foreground placeholder:text-muted-foreground outline-none transition"
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* 2. MAIN CONTENT: VIDEO PLAYER (LEFT) + CHANNELS SIDEBAR (RIGHT) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        {/* VIDEO PLAYER (70% Width / 8 Cols) */}
-        <div className="lg:col-span-9 flex flex-col space-y-2">
+      {/* MAIN CONTENT GRID — all three panels in one grid so we can control order
+          independently per viewport:
+          Mobile (source order):  player → top bar → channels
+          Desktop (lg:row/col):   top bar (row 1, full width) / player (row 2, left 8 cols) / channels (row 2, right 4 cols) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        {/* VIDEO PLAYER — mobile: first; desktop: row 2, cols 1-8 (left panel) */}
+        <div className="lg:col-span-8 lg:row-2 lg:col-start-1 flex flex-col gap-3">
           <ChannelPlayer
             channel={selectedChannel}
             notice={notice}
@@ -259,8 +238,34 @@ export function Dashboard({ server, servers, onSelectServer }: DashboardProps) {
           />
         </div>
 
-        {/* CHANNELS SIDEBAR (30% Width / 4 Cols) */}
-        <div className="lg:col-span-3 flex flex-col space-y-2">
+        {/* TOP BAR: SOURCE SELECTOR + SEARCH — mobile: second; desktop: row 1, full width */}
+        <div className="lg:col-span-12 lg:row-1 lg:col-start-1 flex flex-col gap-3">
+          <section className="glass-panel rounded-2xl border border-border p-3">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+              {/* Source Selector Chips */}
+              <div className="md:col-span-7">
+                <ServerSelector
+                  servers={servers}
+                  selectedServerId={server.id}
+                  onSelect={onSelectServer}
+                />
+              </div>
+
+              {/* Channel Search Input — same location on desktop and mobile. */}
+              <div className="md:col-span-5">
+                <ChannelSearch
+                  value={search}
+                  onChange={setSearch}
+                  id="channelSearchInput"
+                  className="w-full pl-10 pr-9 py-3 bg-background border border-border focus:border-red-500 rounded-xl text-sm text-foreground placeholder:text-muted-foreground outline-none transition-colors focus-visible:ring-2 focus-visible:ring-red-500/20"
+                />
+              </div>
+            </div>
+          </section>
+        </div>
+
+        {/* CHANNELS RAIL — mobile: third; desktop: row 2, cols 9-12 (right panel) */}
+        <div className="lg:col-span-4 lg:row-2 lg:col-start-9 flex flex-col gap-3">
           <ChannelBrowser
             channels={channels}
             workingChannels={tester.workingChannels}
@@ -283,7 +288,7 @@ export function Dashboard({ server, servers, onSelectServer }: DashboardProps) {
         </div>
       </div>
 
-      {/* 3. CHANNEL HEALTH CHECKER (demoted — secondary, desktop only) */}
+      {/* 3. CHANNEL HEALTH CHECKER (desktop only) */}
       <div className="hidden lg:block">
         <ChannelHealth
           counts={tester.counts}
@@ -295,4 +300,3 @@ export function Dashboard({ server, servers, onSelectServer }: DashboardProps) {
     </div>
   )
 }
-

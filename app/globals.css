@@ -48,20 +48,20 @@
 }
 
 :root {
-    --background: #f1f5f9;
-    --foreground: #090b0e;
+    --background: #f8fafc;
+    --foreground: #0f172a;
     --card: #ffffff;
-    --card-foreground: #090b0e;
+    --card-foreground: #0f172a;
     --popover: #ffffff;
-    --popover-foreground: #090b0e;
+    --popover-foreground: #0f172a;
     --primary: #ef4444;
     --primary-foreground: #ffffff;
     --secondary: #f1f5f9;
-    --secondary-foreground: #090b0e;
+    --secondary-foreground: #0f172a;
     --muted: #f1f5f9;
     --muted-foreground: #64748b;
     --accent: #f1f5f9;
-    --accent-foreground: #090b0e;
+    --accent-foreground: #0f172a;
     --destructive: #ef4444;
     --border: #e2e8f0;
     --input: #e2e8f0;
@@ -71,76 +71,92 @@
     --chart-3: #f59e0b;
     --chart-4: #6366f1;
     --chart-5: #ec4899;
-    --radius: 0.625rem;
+    --radius: 0.75rem;
     --sidebar: #ffffff;
-    --sidebar-foreground: #090b0e;
+    --sidebar-foreground: #0f172a;
     --sidebar-primary: #ef4444;
     --sidebar-primary-foreground: #ffffff;
     --sidebar-accent: #f1f5f9;
-    --sidebar-accent-foreground: #090b0e;
+    --sidebar-accent-foreground: #0f172a;
     --sidebar-border: #e2e8f0;
     --sidebar-ring: #ef4444;
 }
 
 .dark {
-    --background: #090b0e;
-    --foreground: #f1f5f9;
-    --card: #11141d;
-    --card-foreground: #f1f5f9;
-    --popover: #11141d;
-    --popover-foreground: #f1f5f9;
+    --background: #020617;
+    --foreground: #f8fafc;
+    --card: #0f172a;
+    --card-foreground: #f8fafc;
+    --popover: #0f172a;
+    --popover-foreground: #f8fafc;
     --primary: #ef4444;
     --primary-foreground: #ffffff;
-    --secondary: #171b27;
-    --secondary-foreground: #f1f5f9;
-    --muted: #171b27;
+    --secondary: #1e293b;
+    --secondary-foreground: #f8fafc;
+    --muted: #1e293b;
     --muted-foreground: #94a3b8;
-    --accent: #171b27;
-    --accent-foreground: #f1f5f9;
+    --accent: #1e293b;
+    --accent-foreground: #f8fafc;
     --destructive: #ef4444;
-    --border: #1c212e;
-    --input: #1c212e;
+    --border: #1e293b;
+    --input: #1e293b;
     --ring: #ef4444;
     --chart-1: #ef4444;
     --chart-2: #10b981;
     --chart-3: #f59e0b;
     --chart-4: #6366f1;
     --chart-5: #ec4899;
-    --sidebar: #11141d;
-    --sidebar-foreground: #f1f5f9;
+    --sidebar: #0f172a;
+    --sidebar-foreground: #f8fafc;
     --sidebar-primary: #ef4444;
     --sidebar-primary-foreground: #ffffff;
-    --sidebar-accent: #171b27;
-    --sidebar-accent-foreground: #f1f5f9;
-    --sidebar-border: #1c212e;
+    --sidebar-accent: #1e293b;
+    --sidebar-accent-foreground: #f8fafc;
+    --sidebar-border: #1e293b;
     --sidebar-ring: #ef4444;
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    }
+  }
   body {
-    @apply bg-background text-foreground;
-    }
+    @apply bg-background text-foreground antialiased;
+  }
   html {
     @apply font-sans;
-    }
+  }
+
+  /* Theme-aware text selection and caret */
+  ::selection {
+    background: color-mix(in oklch, var(--primary), white 60%);
+    color: var(--primary-foreground);
+  }
+  .dark ::selection {
+    background: color-mix(in oklch, var(--primary), black 35%);
+    color: var(--primary-foreground);
+  }
 
   /* Custom Scrollbar */
   ::-webkit-scrollbar {
-    width: 5px;
-    height: 5px;
+    width: 6px;
+    height: 6px;
   }
   ::-webkit-scrollbar-track {
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: rgba(150, 150, 150, 0.25);
+    background: color-mix(in oklch, var(--muted-foreground), black 30%);
     border-radius: 9999px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #ef4444;
+    background: var(--primary);
+  }
+  .dark ::-webkit-scrollbar-thumb {
+    background: color-mix(in oklch, var(--muted-foreground), white 30%);
+  }
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
   }
 
   /* Touch: no double-tap zoom delay on tappable surfaces. */
@@ -149,45 +165,98 @@
   [role="button"],
   input[type="search"] {
     touch-action: manipulation;
+  }
+
+  /* Entrance motion: one authored moment, exponential ease-out from visible default */
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
     }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-slide-in {
+    animation: slideIn 450ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
 }
 
 @layer components {
-  /* Video Player Grid Background matching inspiration */
+  /* Typography scale — set per-component, not global headings */
+  .text-display {
+    font-size: 3rem;
+    line-height: 1.1;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+  .text-heading {
+    font-size: 1.875rem;
+    line-height: 1.25;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .text-title {
+    font-size: 1.25rem;
+    line-height: 1.4;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .text-body {
+    font-size: 1rem;
+    line-height: 1.6;
+    font-weight: 400;
+  }
+  .text-label {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+  .text-caption {
+    font-size: 0.75rem;
+    line-height: 1.5;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+
+  /* Video Player Grid Background — broadcast monitor feel, theme-aware */
   .player-grid-bg {
     background-color: #0c0e15;
-    background-image: 
+    background-image:
       linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
       linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
     background-size: 32px 32px;
   }
 
   :root:not(.dark) .player-grid-bg {
-    background-color: #f1f5f9;
-    background-image: 
-      linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+    background-color: #f8fafc;
+    background-image:
+      linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
     background-size: 32px 32px;
   }
 
+  /* Glass panel — refined, theme-aware, flat at rest */
   .glass-panel {
     background: rgba(17, 20, 29, 0.85);
-    backdrop-filter: blur(12px);
+    backdrop-filter: blur(16px);
     border: 1px solid rgba(255, 255, 255, 0.06);
   }
 
   :root:not(.dark) .glass-panel {
-    background: rgba(255, 255, 255, 0.90);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.02);
   }
 
-  /*
-   * The dashboard grid: on phones the player rail is a sticky block at the
-   * top of the page scroll, and the list scrolls below it; named areas let
-   * the rail (a direct grid child) keep sticking across the whole page.
-   */
+  .dark .glass-panel {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.15);
+  }
+
+  /* Dashboard grid — named areas for rail/main/aside split */
   .dashboard-grid {
     display: grid;
     gap: 1.5rem;

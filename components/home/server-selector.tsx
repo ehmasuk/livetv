@@ -18,8 +18,8 @@ export function ServerSelector({
 }: ServerSelectorProps) {
   return (
     <div className="flex items-center gap-2 overflow-x-auto py-0.5 scrollbar-none flex-wrap">
-      <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground shrink-0 mr-1 flex items-center gap-1">
-        <Server className="w-3.5 h-3.5 text-red-500" /> Source:
+      <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground shrink-0 mr-2 flex items-center gap-1.5">
+        <Server className="w-3.5 h-3.5 text-red-500" /> Source
       </span>
 
       {servers.map((server) => {
@@ -32,26 +32,19 @@ export function ServerSelector({
             onClick={() => onSelect(server.id)}
             aria-pressed={active}
             className={cn(
-              "px-3 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-2 transition shrink-0",
+              "px-3 py-1.5 rounded-xl border text-xs font-medium flex items-center gap-2 shrink-0 transition-all duration-200",
               active
-                ? "border-red-500/60 bg-red-500/10 text-foreground shadow-sm shadow-red-500/20"
-                : "border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted"
+                ? "border-red-500/60 bg-red-500/10 text-foreground shadow-sm shadow-red-500/20 hover:bg-red-500/15 hover:shadow-red-500/30"
+                : "border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted hover:border-slate-300 dark:hover:border-slate-600"
             )}
           >
             <Server
               className={cn("w-3.5 h-3.5", active && "text-red-500")}
             />
             <span>{server.name}</span>
-            <span
-              className={cn(
-                "w-1.5 h-1.5 rounded-full",
-                active ? "bg-red-500 animate-pulse" : "bg-muted-foreground/40"
-              )}
-            />
           </Button>
         )
       })}
     </div>
   )
 }
-

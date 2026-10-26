@@ -19,7 +19,7 @@ type ChannelSearchProps = {
 export function ChannelSearch({
   value,
   onChange,
-  placeholder = "Search channels...",
+  placeholder = "Search channels…",
   type = "text",
   id,
   className,
@@ -31,7 +31,7 @@ export function ChannelSearch({
     <div className={containerClassName}>
       <div className="relative">
         <Search
-          className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
+          className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
         />
         <input
           type={type}
@@ -43,7 +43,7 @@ export function ChannelSearch({
           enterKeyHint="search"
           className={cn(
             className,
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/50 focus-visible:ring-offset-1 focus-visible:border-red-500/60"
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/20 focus-visible:ring-offset-1 focus-visible:border-red-500/60"
           )}
           aria-label="Search channels"
         />
@@ -54,7 +54,7 @@ export function ChannelSearch({
             aria-label="Clear search"
             variant="ghost"
             size="icon-sm"
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition p-1"
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1.5"
           >
             <X className="w-3.5 h-3.5" />
           </Button>

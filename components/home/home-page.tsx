@@ -42,7 +42,7 @@ export function HomePage({ servers }: HomePageProps) {
   }
 
   return (
-    <div className="mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 py-4 pb-[max(env(safe-area-inset-bottom),1.5rem)]">
+    <div className="mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 py-6 pb-[max(env(safe-area-inset-bottom),1.5rem)]">
       <Dashboard
         key={selectedServer.id}
         servers={servers}

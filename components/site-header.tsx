@@ -17,16 +17,16 @@ function GithubIcon({ className = "w-4 h-4" }: { className?: string }) {
 
 export function SiteHeader() {
   return (
-    <header className="border-b border-border/80 bg-background/95 backdrop-blur-md">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-4">
-        <Logo />
+    <header className="border-b border-border bg-background/80 backdrop-blur-sm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+        <Logo className="select-none" />
 
         <div className="flex items-center gap-2">
           <a
             href="https://github.com/ehmasuk"
             target="_blank"
             rel="noopener noreferrer"
-            className="p-2 rounded-xl bg-card border border-border text-muted-foreground hover:text-foreground hover:border-slate-400 dark:hover:border-slate-600 transition flex items-center justify-center shadow-sm"
+            className="w-8 h-8 p-2 rounded-xl bg-card border border-border text-muted-foreground hover:text-foreground hover:border-slate-400 dark:hover:border-slate-600 transition-colors flex items-center justify-center shadow-sm hover:shadow-[0_0_0_1px_hsl(var(--primary)/0.2)]"
             title="View Source on GitHub"
             aria-label="View Source on GitHub"
           >
@@ -39,4 +39,3 @@ export function SiteHeader() {
     </header>
   )
 }
-

@@ -15,19 +15,19 @@ const TVPlayer = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="w-full overflow-hidden rounded-2xl border border-border bg-background shadow-lg flex flex-col">
+      <div className="w-full overflow-hidden rounded-2xl border border-border bg-card shadow-sm flex flex-col">
         <div className="relative aspect-video player-grid-bg flex items-center justify-center">
           <div
             className="h-10 w-10 animate-spin rounded-full border-4 border-border/50 border-t-red-500"
             aria-hidden="true"
           />
         </div>
-        <div className="flex items-center gap-2 px-4 py-3 border-t border-border/80 bg-background/95">
+        <div className="flex items-center gap-3 px-6 py-4 border-t border-border/80 bg-card/80">
           <span className="h-2 w-2 rounded-full bg-amber-400 animate-pulse" />
           <span className="truncate text-sm font-medium text-muted-foreground">
-            Loading player...
+            Loading player…
           </span>
-          <span className="ml-auto text-xs text-muted-foreground">
+          <span className="ml-auto text-xs font-medium text-muted-foreground uppercase tracking-wider">
             LOADING
           </span>
         </div>
@@ -71,32 +71,32 @@ export function ChannelPlayer({
 }: ChannelPlayerProps) {
   if (!channel) {
     return (
-      <div className="w-full overflow-hidden rounded-2xl border border-border bg-background shadow-lg flex flex-col">
+      <div className="w-full overflow-hidden rounded-2xl border border-border bg-card shadow-sm flex flex-col">
         {/* Relative aspect-video screen matching real player */}
-        <div className="relative aspect-video dark:bg-slate-900 bg-black flex flex-col items-center justify-center p-6 text-center select-none">
-          <div className="flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-full bg-card/90 border border-border/80 dark:text-muted-foreground shadow transition-transform duration-200 hover:scale-105">
-            <Play className="h-7 w-7 sm:h-8 sm:w-8 fill-current ml-1" />
+        <div className="relative aspect-video dark:bg-slate-950 bg-black flex flex-col items-center justify-center p-8 text-center select-none">
+          <div className="flex size-16 sm:h-20 sm:w-20 items-center justify-center rounded-full bg-white/10 border border-white/20 dark:text-muted-foreground shadow transition-transform duration-300 hover:scale-105">
+            <Play className="size-7 sm:size-8 fill-current ml-0.5 text-white/80" />
           </div>
 
-          <p className="mt-4 text-sm sm:text-base font-semibold text-white/80 dark:text-accent-foreground">
+          <p className="mt-6 text-sm sm:text-base font-semibold text-white/90 dark:text-foreground">
             Select a channel to begin
           </p>
-          <p className="mt-1 text-xs text-white/80 dark:text-accent-foreground">
+          <p className="mt-2 text-xs text-white/70 dark:text-muted-foreground">
             Choose a stream from the live channels library
           </p>
-          <p className="mt-2 text-[10px] text-muted-foreground/70">
+          <p className="mt-4 text-[10px] text-muted-foreground/60 max-w-xs mx-auto">
             Streams are tested in your browser before you play — green means
             it&apos;s working.
           </p>
         </div>
 
         {/* Real-matching bottom control bar */}
-        <div className="flex items-center gap-2 px-4 py-3 border-t border-border/80 bg-background/95">
-          <span className="h-2 w-2 rounded-full bg-muted-foreground/40" />
+        <div className="flex items-center gap-3 px-6 py-4 border-t border-border/80 bg-card/80">
+          <span className="h-2 w-2 rounded-full bg-muted-foreground/30" />
           <span className="truncate text-sm font-medium text-muted-foreground">
             No channel selected
           </span>
-          <span className="ml-auto text-xs text-muted-foreground">
+          <span className="ml-auto text-xs font-medium text-muted-foreground uppercase tracking-wider">
             READY
           </span>
         </div>
@@ -105,13 +105,15 @@ export function ChannelPlayer({
   }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       {notice && (
         <div
           role="status"
-          className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2"
+          className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 shadow-sm"
         >
-          <p className="text-sm text-red-500 dark:text-red-200">{notice.text}</p>
+          <p className="text-sm text-red-500 dark:text-red-200 font-medium">
+            {notice.text}
+          </p>
 
           {notice.terminal && (
             <Button
@@ -119,7 +121,7 @@ export function ChannelPlayer({
               onClick={onRetry}
               variant="destructive"
               size="sm"
-              className="bg-red-600 rounded-lg px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-500"
+              className="rounded-xl bg-red-600 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-red-500 hover:shadow-[0_0_0_1px_hsl(var(--primary)/0.4)]"
             >
               Try again
             </Button>
@@ -140,5 +142,3 @@ export function ChannelPlayer({
     </div>
   )
 }
-
-

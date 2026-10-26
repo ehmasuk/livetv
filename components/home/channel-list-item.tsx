@@ -57,20 +57,20 @@ export const ChannelListItem = memo(function ChannelListItem({
       aria-pressed={selected}
       aria-label={`${channel.name}, ${channel.group}, ${statusLabel}`}
       className={cn(
-        "cv-row p-2.5 rounded-lg border transition-all cursor-pointer flex items-center justify-between group w-full text-left outline-none",
+        "cv-row p-3 rounded-xl border transition-all duration-200 cursor-pointer flex items-center justify-between group w-full text-left outline-none",
         selected
-          ? "bg-red-500/10 border-red-500 shadow-md shadow-red-500/10"
-          : "bg-card/80 border-border hover:bg-card hover:border-slate-400 dark:hover:border-slate-700",
+          ? "bg-red-500/10 border-red-500/50 shadow-[0_0_0_1px_hsl(var(--primary)/0.25)]"
+          : "bg-card border-border hover:bg-muted/40 hover:border-slate-300 dark:hover:border-slate-700 dark:hover:bg-muted/20",
         "focus-visible:ring-2 focus-visible:ring-red-500/50 focus-visible:ring-offset-1 focus-visible:border-red-500/60"
       )}
     >
-      <div className="flex items-center gap-2.5 min-w-0">
+      <div className="flex items-center gap-3 min-w-0">
         <div
           className={cn(
-            "w-8 h-8 rounded-md flex items-center justify-center text-[10px] font-bold shrink-0 overflow-hidden",
+            "w-9 h-9 shrink-0 rounded-xl flex items-center justify-center text-[11px] font-bold overflow-hidden",
             selected
               ? "bg-red-500 text-white"
-              : "bg-muted text-muted-foreground"
+              : "bg-muted/50 text-muted-foreground"
           )}
         >
           {showLogo ? (
@@ -86,8 +86,8 @@ export const ChannelListItem = memo(function ChannelListItem({
               decoding="async"
               fetchPriority="low"
               referrerPolicy="no-referrer"
-              width={32}
-              height={32}
+              width={36}
+              height={36}
               className="h-full w-full object-contain p-0.5"
               onError={() => setLogoFailed(true)}
             />
@@ -97,11 +97,11 @@ export const ChannelListItem = memo(function ChannelListItem({
         </div>
 
         <div className="min-w-0">
-          <div className="text-xs font-bold text-foreground group-hover:text-red-500 dark:group-hover:text-white transition-colors truncate">
+          <div className="text-sm font-semibold text-foreground group-hover:text-red-500 dark:group-hover:text-red-400 transition-colors truncate">
             {channel.name}
           </div>
           {channel.group && channel.group !== "Uncategorized" && (
-            <div className="text-[9px] text-muted-foreground truncate mt-0.5">
+            <div className="text-[10px] text-muted-foreground/90 truncate mt-0.5 uppercase tracking-wider font-medium">
               {channel.group}
             </div>
           )}
@@ -112,11 +112,10 @@ export const ChannelListItem = memo(function ChannelListItem({
       <span
         title={statusLabel}
         className={cn(
-          "w-2 h-2 rounded-full shrink-0 ml-2",
+          "w-2.5 h-2.5 rounded-full shrink-0",
           STATUS_DOT_CLASSES[status ?? "untested"]
         )}
       />
     </div>
   )
 })
-
